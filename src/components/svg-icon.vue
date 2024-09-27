@@ -4,7 +4,7 @@
   </svg>
   <Suspense v-else>
     <template #default>
-      <weapp-load-svg :color="props.color" :name="props.name" :size="props.size"></weapp-load-svg>
+      <weapp-load-svg :color="innerColor" :name="props.name" :size="props.size"></weapp-load-svg>
     </template>
     <template #fallback> <view></view> </template>
   </Suspense>
@@ -30,6 +30,10 @@ const customStyle = reactive({
   color: props.color,
   width: Taro.pxTransform(props.size),
   height: Taro.pxTransform(props.size),
+});
+
+const innerColor = computed(() => {
+  return props.color || '';
 });
 
 const isWeapp = process.env.TARO_ENV === 'weapp';

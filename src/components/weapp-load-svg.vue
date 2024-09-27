@@ -22,11 +22,18 @@ const iconSize = ref(props.size);
 const svgModule = require(`../assets/icons/${props.name}.svg`);
 const base64Svg = ref();
 
-const convertSvg = computed(() => {
-  return svgModule.replace(/fill="#*[a-zA-Z0-9]+"/g, `fill="${props.color}"`);
-});
+let convertSvg;
 
-base64Svg.value = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(convertSvg.value)}`;
+watch(
+  () => props.color,
+  () => {
+    convertSvg = svgModule.replace(/fill="#*[a-zA-Z0-9]+"/g, `fill="${props.color}"`);
+    base64Svg.value = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(convertSvg)}`;
+  },
+  {
+    immediate: true,
+  },
+);
 
 const customStyle = reactive({
   width: Taro.pxTransform(props.size),
