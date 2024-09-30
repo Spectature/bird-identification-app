@@ -6,18 +6,13 @@ import MediaLoader from "@/components/media-loader.vue";
 const isLoading = ref(false);
 
 const type = ref("");
-setTimeout(() => {
-  type.value = "image";
-});
-let src;
+const src = ref("");
 
 const handleReceiveData = (data: any) => {
   const convertRes = JSON.parse(data);
   // 在这里处理接收到的数据
   type.value = convertRes.type;
-  src = convertRes.url;
-  console.log(type.value);
-  console.log(src);
+  src.value = convertRes.url;
 };
 
 // WebSocket 连接地址
@@ -51,7 +46,7 @@ const connectWebSocket = () => {
 };
 
 onMounted(() => {
-  // connectWebSocket();
+  connectWebSocket();
 });
 
 onUnmounted(() => {
