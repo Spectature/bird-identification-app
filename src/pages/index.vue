@@ -46,7 +46,7 @@
       </view>
     </view>
     <view class="bottom">
-      <tab-bar></tab-bar>
+      <tab-bar :current-index="0"></tab-bar>
     </view>
   </view>
 </template>

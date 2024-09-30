@@ -7,6 +7,12 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Audio: typeof import('./src/components/audio.vue')['default']
+    AudioApp: typeof import('./src/components/audio-app.vue')['default']
+    MediaLoader: typeof import('./src/components/media-loader.vue')['default']
+    NutActionSheet: typeof import('nutui-uniapp/components/actionsheet/actionsheet.vue')['default']
+    NutButton: typeof import('nutui-uniapp/components/button/button.vue')['default']
+    NutIcon: typeof import('nutui-uniapp/components/icon/icon.vue')['default']
     NutSwiper: typeof import('nutui-uniapp/components/swiper/swiper.vue')['default']
     NutSwiperItem: typeof import('nutui-uniapp/components/swiperitem/swiperitem.vue')['default']
     NutTabbar: typeof import('nutui-uniapp/components/tabbar/tabbar.vue')['default']

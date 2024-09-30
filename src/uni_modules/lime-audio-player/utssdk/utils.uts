@@ -1,0 +1,12 @@
+/**
+ * 获取资源文件的原生路径
+ * @param {string} path 资源路径
+ */
+export const getResourcePath = (path: string): string => {
+	// #ifdef APP-ANDROID
+	return UTSAndroid.getResourcePath(path);
+	// #endif
+	// #ifdef APP-IOS
+	return UTSiOS.getResourcePath(path);
+	// #endif
+}

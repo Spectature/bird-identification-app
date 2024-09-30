@@ -1,0 +1,450 @@
+import Context from "android.content.Context";
+import MediaPlayer from "android.media.MediaPlayer";
+import ConnectivityManager from "android.net.ConnectivityManager"
+import Build from "android.os.Build"
+import NetworkCapabilities from "android.net.NetworkCapabilities"
+import PlaybackParams from "android.media.PlaybackParams";
+import AudioManager from "android.media.AudioManager";
+import AudioAttributes from "android.media.AudioAttributes";
+
+import {
+	InnerAudioContext,
+	InnerAudioContextOnErrorListenerResult,
+	OnCanplayCallback,
+	OnEndedCallback,
+	InnerAudioContextOnErrorCallback,
+	OnPauseCallback,
+	OnPlayCallback,
+	OnSeekedCallback,
+	OnSeekingCallback,
+	InnerAudioContextOnStopCallback,
+	OnTimeUpdateCallback,
+	OnWaitingCallback
+} from '../interface'
+import { InnerAudioContextOnErrorListenerResultImpl, GeneralCallbackResultImpl } from '../unierror'
+//
+class InnerAudioContextImpl implements InnerAudioContext {
+	@Volatile
+	private mediaPlayer ?: MediaPlayer | null = null
+	private _src : string = ''
+	autoplay : boolean = false
+	private _buffered : number = 0
+	private _currentTime : number = 0
+	private _duration : number = 0
+	private _paused : boolean = false
+	private _loop : boolean = false
+	obeyMuteSwitch : boolean = true
+	private _playbackRate : number = 1
+	referrerPolicy : string = ''
+	startTime : number = 0
+	private _volume : number = 1
+	private _timer : number = -1
+	private _isPrepared : boolean = false
+	private OnCanplayCallbackArray : OnCanplayCallback[] = []
+	private OnEndedCallbackArray : OnEndedCallback[] = []
+	private InnerAudioContextOnStopCallbackArray : InnerAudioContextOnStopCallback[] = []
+	private InnerAudioContextOnErrorCallbackArray : InnerAudioContextOnErrorCallback[] = []
+	private OnPauseCallbackArray : OnPauseCallback[] = []
+	private OnPlayCallbackArray : OnPlayCallback[] = []
+	private OnSeekedCallbackArray : OnSeekedCallback[] = []
+	private OnSeekingCallbackArray : OnSeekingCallback[] = []
+	private OnTimeUpdateCallbackArray : OnTimeUpdateCallback[] = []
+	private OnWaitingCallbackArray : OnWaitingCallback[] = []
+	constructor() {
+		this.mediaPlayer = new MediaPlayer()
+		// 监听结束 OnWaiting
+		this.mediaPlayer?.setOnBufferingUpdateListener((_ : MediaPlayer, percent : Int) => {
+			this._buffered = Number.from(percent)
+			const res = new GeneralCallbackResultImpl('缓冲中：' + percent.toString())
+			this.OnWaitingCallbackArray.forEach(listener => {
+				listener(res)
+			})
+		})
+		// 加载完成
+		this.mediaPlayer?.setOnPreparedListener((_ : MediaPlayer) => {
+			this._isPrepared = true
+			if (this.autoplay && this.paused) {
+				this.play()
+			}
+			const res = new GeneralCallbackResultImpl('ok')
+			this.OnCanplayCallbackArray.forEach(listener => {
+				listener(res)
+			})
+		})
+		// 监听结束 onEnded
+		this.mediaPlayer?.setOnCompletionListener((_ : MediaPlayer) => {
+			clearTimeout(this._timer)
+			const res = new GeneralCallbackResultImpl('播放完毕')
+			this.OnEndedCallbackArray.forEach(listener => {
+				listener(res)
+			})
+		})
+		// 监听错误 onError
+		this.mediaPlayer?.setOnErrorListener((_ : MediaPlayer, what : Int, extra : Int) : boolean => {
+			// const result = {
+			// 	errCode: Number.from(what),
+			// 	errMsg: '播放错误'
+			// } as InnerAudioContextOnErrorListenerResult;
+			let result : InnerAudioContextOnErrorListenerResult | null
+			if (!this.isNetworkError()) {
+				result = new InnerAudioContextOnErrorListenerResultImpl(10002)
+				// result.errCode = 10002
+				// result.errMsg = '网络错误'
+			} else if (MediaPlayer.MEDIA_ERROR_IO == what) {
+				result = new InnerAudioContextOnErrorListenerResultImpl(10003)
+				// result.errCode = 10003 
+				// result.errMsg = '文件错误'
+			} else if (MediaPlayer.MEDIA_ERROR_MALFORMED == extra) {
+				// result.errCode = 10004 
+				// result.errMsg = '格式错误'
+				result = new InnerAudioContextOnErrorListenerResultImpl(10004)
+			} else {
+				result = new InnerAudioContextOnErrorListenerResultImpl(-1)
+				// result.errCode = -1
+				// result.errMsg = '未知错误,也许文件不存在'
+			}
+			this.InnerAudioContextOnErrorCallbackArray.forEach(listener => {
+				listener(result)
+			})
+			return true
+		})
+		// 监听跳转 OnSeek
+		this.mediaPlayer?.setOnSeekCompleteListener((_ : MediaPlayer) => {
+			const res = new GeneralCallbackResultImpl('跳转完毕')
+			this.OnSeekedCallbackArray.forEach(listener => {
+				listener(res)
+			})
+
+			if (!this.paused) {
+				clearTimeout(this._timer)
+				this.updatePlaybackProgress()
+			}
+		})
+	}
+	private updatePlaybackProgress() {
+		if (this.mediaPlayer == null && this.paused && this.OnTimeUpdateCallbackArray.length > 0) return
+		const res = new GeneralCallbackResultImpl(`播放进度: ${this.mediaPlayer?.getCurrentPosition()}`)
+		this.OnTimeUpdateCallbackArray.forEach(listener => {
+			listener(res)
+		})
+		this._timer = setTimeout(() => {
+			this.updatePlaybackProgress()
+		}, 1000)
+	}
+	@Suppress("DEPRECATION")
+	private isNetworkError() : boolean {
+		const manager = UTSAndroid.getAppContext()!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			const network = manager.activeNetwork
+			if (network == null) return false
+			const it = manager.getNetworkCapabilities(network)
+			if (it?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
+				it?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
+				it?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true ||
+				it?.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) == true ||
+				it?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
+			) {
+				return true
+			}
+		} else {
+			return manager.activeNetworkInfo?.isConnected == true
+		}
+		return false
+	}
+	set volume(volume : number) {
+		if (volume < 0 || volume > 1) return
+		this._volume = volume
+		this.mediaPlayer?.setVolume(volume.toFloat(), volume.toFloat())
+	}
+	get volume() : number {
+		return this._volume
+	}
+	get loop() : boolean {
+		return this.mediaPlayer?.isLooping() ?? this._loop
+	}
+	set loop(param0 : boolean) {
+		this.mediaPlayer?.setLooping(param0)
+	}
+	get buffered() : number {
+		return this._buffered
+	}
+	get currentTime() : number {
+		return (this.mediaPlayer?.getCurrentPosition() ?? this._currentTime) / 1000 // 60
+	}
+	set currentTime(s : number) {
+		this._currentTime = s * 1000 //* 60
+		this.mediaPlayer?.seekTo(this._currentTime.toInt())
+	}
+	get duration() : number {
+		return (this.mediaPlayer?.getDuration() ?? this._duration) / 1000 // 60
+	}
+	get paused() : boolean {
+		if (this.mediaPlayer == null) return this._paused
+		return !(this.mediaPlayer!.isPlaying())
+	}
+	set src(v : string) {
+		this._src = v
+		if (v.startsWith('/static')) {
+			this._src = UTSAndroid.convert2AbsFullPath(v)
+		}
+		try {
+			clearTimeout(this._timer)
+			this._isPrepared = false;
+			this.mediaPlayer?.stop()
+			this.mediaPlayer?.reset();
+			this.mediaPlayer?.setDataSource(this._src)
+			this.mediaPlayer?.prepareAsync()
+			// this.mediaPlayer?.prepare()
+
+		} catch (e) {
+			this.InnerAudioContextOnErrorCallbackArray.forEach(listener => {
+				listener(new InnerAudioContextOnErrorListenerResultImpl(10003))
+			})
+		}
+
+	}
+	get src() : string {
+		return this._src
+	}
+	set playbackRate(speed : number) {
+		if (speed <= 0 || speed > 8 || this.mediaPlayer == null) return
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			const params = new PlaybackParams()
+			params.setSpeed(speed.toFloat());
+			this.mediaPlayer!.setPlaybackParams(params)
+		}
+	}
+	get playbackRate() : number {
+		const rate : number | null = this.mediaPlayer?.getPlaybackParams()!.getSpeed()
+		return rate ?? this._playbackRate
+	}
+	destroy() {
+		// 释放MediaPlayer对象
+		clearTimeout(this._timer)
+		this.mediaPlayer?.release()
+		this.mediaPlayer = null
+		this.OnCanplayCallbackArray = []
+		this.OnEndedCallbackArray = []
+		this.InnerAudioContextOnStopCallbackArray = []
+		this.InnerAudioContextOnErrorCallbackArray = []
+		this.OnPauseCallbackArray = []
+		this.OnPlayCallbackArray = []
+		this.OnSeekedCallbackArray = []
+		this.OnSeekingCallbackArray = []
+		this.OnTimeUpdateCallbackArray = []
+		this.OnWaitingCallbackArray = []
+	}
+	
+	offCanplay() : void
+	offCanplay(listener ?: OnCanplayCallback) {
+		if (listener == null) {
+			this.OnCanplayCallbackArray = []
+		} else {
+			this.OnCanplayCallbackArray = this.OnCanplayCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offEnded() : void
+	offEnded(listener ?: OnEndedCallback) {
+		if (listener == null) {
+			this.OnEndedCallbackArray = []
+		} else {
+			this.OnEndedCallbackArray = this.OnEndedCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offError() : void
+	offError(listener ?: InnerAudioContextOnErrorCallback) {
+		if (listener == null) {
+			this.InnerAudioContextOnErrorCallbackArray = []
+		} else {
+			this.InnerAudioContextOnErrorCallbackArray = this.InnerAudioContextOnErrorCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offPause() : void
+	offPause(listener ?: OnPauseCallback) {
+		if (listener == null) {
+			this.OnPauseCallbackArray = []
+		} else {
+			this.OnPauseCallbackArray = this.OnPauseCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offPlay() : void
+	offPlay(listener ?: OnPlayCallback) {
+		if (listener == null) {
+			this.OnPlayCallbackArray = []
+		} else {
+			this.OnPlayCallbackArray = this.OnPlayCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offSeeked() : void
+	offSeeked(listener ?: OnSeekedCallback) {
+		if (listener == null) {
+			this.OnSeekedCallbackArray = []
+		} else {
+			this.OnSeekedCallbackArray = this.OnSeekedCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offSeeking() : void
+	offSeeking(listener ?: OnSeekingCallback) {
+		if (listener == null) {
+			this.OnSeekingCallbackArray = []
+		} else {
+			this.OnSeekingCallbackArray = this.OnSeekingCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offStop() : void
+	offStop(listener ?: InnerAudioContextOnStopCallback) {
+		if (listener == null) {
+			this.InnerAudioContextOnStopCallbackArray = []
+		} else {
+			this.InnerAudioContextOnStopCallbackArray = this.InnerAudioContextOnStopCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offTimeUpdate() : void
+	offTimeUpdate(listener ?: OnTimeUpdateCallback) {
+		if (listener == null) {
+			this.OnTimeUpdateCallbackArray = []
+		} else {
+			this.OnTimeUpdateCallbackArray = this.OnTimeUpdateCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	offWaiting() : void
+	offWaiting(listener ?: OnWaitingCallback) {
+		if (listener == null) {
+			this.OnCanplayCallbackArray = []
+		} else {
+			this.OnCanplayCallbackArray = this.OnCanplayCallbackArray.filter(
+				(callback) : boolean => callback !== listener
+			);
+		}
+	}
+	onCanplay(listener : OnCanplayCallback) {
+		this.OnCanplayCallbackArray.push(listener)
+	}
+	onEnded(listener : OnEndedCallback) {
+		this.OnEndedCallbackArray.push(listener)
+	}
+	onError(listener : InnerAudioContextOnErrorCallback) {
+		this.InnerAudioContextOnErrorCallbackArray.push(listener)
+	}
+	onPause(listener : OnPauseCallback) {
+		this.OnPauseCallbackArray.push(listener)
+		clearTimeout(this._timer)
+	}
+	onPlay(listener : OnPlayCallback) {
+		this.OnPlayCallbackArray.push(listener)
+		clearTimeout(this._timer)
+		if (this.paused) return
+		this.updatePlaybackProgress()
+	}
+	onSeeked(listener : OnSeekedCallback) {
+		this.OnSeekedCallbackArray.push(listener)
+	}
+	onSeeking(listener : OnSeekingCallback) {
+		this.OnSeekingCallbackArray.push(listener)
+	}
+	onStop(listener : InnerAudioContextOnStopCallback) {
+		this.InnerAudioContextOnStopCallbackArray.push(listener)
+		clearTimeout(this._timer)
+	}
+	onTimeUpdate(listener : OnTimeUpdateCallback) {
+		this.OnTimeUpdateCallbackArray.push(listener)
+		clearTimeout(this._timer)
+		if (this.paused) return
+		this.updatePlaybackProgress()
+	}
+	onWaiting(listener : OnWaitingCallback) {
+		this.OnWaitingCallbackArray.push(listener)
+	}
+	pause() {
+		if (this.mediaPlayer == null) return
+		this.mediaPlayer!.pause()
+		clearTimeout(this._timer)
+		if (this.paused) {
+			const res = new GeneralCallbackResultImpl('暂停')
+			this.OnPauseCallbackArray.forEach(listener => {
+				listener(res)
+			})
+		}
+	}
+	play() {
+		if (this.mediaPlayer == null) return
+		if (this.paused) {
+			this.mediaPlayer!.start();
+		}
+		if (!this.paused) {
+			const res = new GeneralCallbackResultImpl('播放')
+			this.OnPlayCallbackArray.forEach(listener => {
+				listener(res)
+			})
+			clearTimeout(this._timer)
+			this.updatePlaybackProgress()
+		}
+	}
+	seek(position : number) {
+		if (this.mediaPlayer == null) return
+		this._currentTime = position * 1000// * 60
+		this.mediaPlayer!.seekTo(this._currentTime.toInt())
+		const res = new GeneralCallbackResultImpl('跳转中')
+		this.OnSeekingCallbackArray.forEach(listener => {
+			listener(res)
+		})
+	}
+	stop() {
+		if (this.mediaPlayer == null) return
+		this.mediaPlayer!.stop()
+		clearTimeout(this._timer)
+		if (this.paused) {
+			const res = new GeneralCallbackResultImpl('停止')
+			this.InnerAudioContextOnStopCallbackArray.forEach(listener => {
+				listener(res)
+			})
+		}
+	}
+	/**
+	 * 设置音频输出流类型。
+	 * @param outputType 音频输出类型，0 表示扬声器（外放），1 表示听筒。
+	 */
+	setAudioOutput(outputType : number) {
+		if(this.mediaPlayer == null) return
+		if (outputType == 0) {
+			// this.mediaPlayer!.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			const audioAttributesLoudspeaker = new AudioAttributes.Builder()
+			        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+			        .setUsage(AudioAttributes.USAGE_MEDIA)
+			        .build();
+			this.mediaPlayer!.setAudioAttributes(audioAttributesLoudspeaker);
+		} else if (outputType == 1) {
+			const audioAttributesLoudspeaker = new AudioAttributes.Builder()
+			        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+			        .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+			        .build();
+			this.mediaPlayer!.setAudioAttributes(audioAttributesLoudspeaker);
+			// this.mediaPlayer!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+		} else {
+			// Invalid output type. Must be 0 (speaker) or 1 (earpiece).
+		}
+	}
+}
+
+
+export function createInnerAudioContext() : InnerAudioContext {
+	return new InnerAudioContextImpl()
+}

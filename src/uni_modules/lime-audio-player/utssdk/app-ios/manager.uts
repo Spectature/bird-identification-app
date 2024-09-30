@@ -1,0 +1,664 @@
+import { URL, Notification, NotificationCenter, NSKeyValueObservingOptions, NSKeyValueChangeKey, Timer } from 'Foundation';
+import { AVPlayer, AVPlayerItem, AVMutableAudioMixInputParameters, AVMediaType, AVMutableAudioMix } from 'AVFoundation';
+import { CMTime } from 'CoreMedia';
+import { Selector, NSObject } from 'ObjectiveC';
+import { UnsafeMutableRawPointer } from 'Swift';
+import { AVAudioSession } from 'AVFAudio';
+import {
+	InnerAudioContext,
+	OnCanplayCallback,
+	OnEndedCallback,
+	InnerAudioContextOnErrorCallback,
+	OnPauseCallback,
+	OnPlayCallback,
+	OnSeekedCallback,
+	OnSeekingCallback,
+	InnerAudioContextOnStopCallback,
+	OnTimeUpdateCallback,
+	OnWaitingCallback
+} from '../interface'
+import { InnerAudioContextOnErrorListenerResultImpl, GeneralCallbackResultImpl } from '../unierror'
+
+
+
+
+/**
+ * CMTime转换为秒
+ * @param { CMTime } cmtime 需要转换的CMTime参数
+ */
+function cmtimeToSeconds(cmtime : CMTime, floor : boolean = true) : number {
+	const seconds = Number.from(cmtime.seconds);
+
+	if (floor) {
+		return Math.floor(Number.from(cmtime.seconds));
+	}
+
+	return seconds;
+}
+
+export class InnerAudioContextImpl implements InnerAudioContext {
+	private _playerItem : AVPlayerItem | null = null;
+	private _audioPlayer : AVPlayer | null = new AVPlayer();
+	private _src : string = ''
+	autoplay : boolean = false
+	private _buffered : number = 0
+	private _currentTime : number = 0
+	private _duration : number = 0
+	private _paused : boolean = false
+	private _loop : boolean = false
+	// obeyMuteSwitch : boolean = true
+	private _obeyMuteSwitch : boolean = true
+	private _playbackRate : number = 1
+	referrerPolicy : string = ''
+	private _startTime : number = 0
+	private _volume : number = 1
+	private _timer : Timer | null = null //number = -1
+	private _isPrepared : boolean = false
+	private _lastPosition : CMTime | null = null
+	private _isPlaying : boolean = false
+	private OnCanplayCallbackArray : Set<OnCanplayCallback> = new Set<OnCanplayCallback>()
+	private OnEndedCallbackArray : Set<OnEndedCallback> = new Set<OnEndedCallback>()
+	private InnerAudioContextOnStopCallbackArray : Set<InnerAudioContextOnStopCallback> = new Set<InnerAudioContextOnStopCallback>()
+	private InnerAudioContextOnErrorCallbackArray : Set<InnerAudioContextOnErrorCallback> = new Set<InnerAudioContextOnErrorCallback>()
+	private OnPauseCallbackArray : Set<OnPauseCallback> = new Set<OnPauseCallback>()
+	private OnPlayCallbackArray : Set<OnPlayCallback> = new Set<OnPlayCallback>()
+	private OnSeekedCallbackArray : Set<OnSeekedCallback> = new Set<OnSeekedCallback>()
+	private OnSeekingCallbackArray : Set<OnSeekingCallback> = new Set<OnSeekingCallback>()
+	private OnTimeUpdateCallbackArray : Set<OnTimeUpdateCallback> = new Set<OnTimeUpdateCallback>()
+	private OnWaitingCallbackArray : Set<OnWaitingCallback> = new Set<OnWaitingCallback>()
+	private observers: Map<string, NSObject> = new Map<string, NSObject>()
+	
+	constructor() {
+		super.init();
+	}
+	updateAutoplay(v : boolean) {
+		this.autoplay = v
+	}
+	private handleException(code : number, errMsg : string | null = null) {
+		const result = new InnerAudioContextOnErrorListenerResultImpl(code, errMsg)
+		this.InnerAudioContextOnErrorCallbackArray.forEach(listener => {
+			(listener as InnerAudioContextOnErrorCallback)(result)
+		})
+	}
+	private stopTimer() {
+		this._timer?.invalidate();
+	}
+
+	@objc private checkSeekingStatus() {
+		if (this._audioPlayer == null || this._lastPosition == null) return
+		const currentPosition = this._audioPlayer!.currentTime();
+		// 如果当前时间和上一次记录的时间相差很大，则认为是在快进或快退
+		const timeDifference = CMTimeSubtract(currentPosition, this._lastPosition!);
+		const timeDifferenceSeconds = CMTimeGetSeconds(timeDifference);
+
+		if (timeDifferenceSeconds > 1 || timeDifferenceSeconds < -1) {
+			if (this._audioPlayer!.rate != 0) {
+				const res = new GeneralCallbackResultImpl('跳转中')
+				this.OnSeekingCallbackArray.forEach(listener => {
+					(listener as OnSeekingCallback)(res)
+				})
+			}
+		}
+
+		this._lastPosition = currentPosition;
+	}
+	/**
+	* 创建检测播放位置变化的计时器
+	*/
+	private createCheckSeekingStatusTimer() {
+		this.stopTimer();
+		this._timer = Timer.scheduledTimer(timeInterval = 0.1, target = this, selector = new Selector('checkSeekingStatus'), userInfo = null, repeats = true);
+	}
+	override observeValue(@argumentLabel("forKeyPath") keyPath : string | null, @argumentLabel("of") object : any | null, @argumentLabel("") change : Map<NSKeyValueChangeKey, any> | null, @argumentLabel("") context : UnsafeMutableRawPointer | null) {
+		if (object == null) return
+		/**
+		 * 监听状态变化
+		 */
+		if (keyPath == 'status') {
+			switch (this._playerItem!.status) {
+				case AVPlayerItem.Status.readyToPlay:
+					// 加载完成
+					this._isPrepared = true
+					this._duration = cmtimeToSeconds(this._playerItem!.duration);
+					this._volume = Number.from(this._audioPlayer!.volume);
+					if (this.autoplay && this.paused) {
+						this.play()
+					}
+					const result = new GeneralCallbackResultImpl('ok')
+					this.OnCanplayCallbackArray.forEach((listener) => {
+						(listener as OnCanplayCallback)(result)
+					})
+					break;
+				case AVPlayerItem.Status.failed:
+					// 加载失败
+					this.handleException(10003, this._playerItem!.error!.localizedDescription);
+					break;
+				case AVPlayerItem.Status.unknown:
+					//状态未知
+					break;
+				default:
+				// 其他状态
+			}
+		}
+
+		// 播放速度监听
+		if (keyPath == 'rate') {
+			if (this._audioPlayer!.rate == 0) {
+				// 停止计时器计时
+				this.stopTimer();
+				if (this.duration > Math.floor(this.currentTime)) {
+					const result = new GeneralCallbackResultImpl('暂停')
+					this.OnPauseCallbackArray.forEach((listener) => {
+						(listener as OnPauseCallback)(result)
+					})
+					this._isPlaying = false;
+				}
+			} else {
+				const result = new GeneralCallbackResultImpl('播放')
+				this.OnPlayCallbackArray.forEach((listener) => {
+					(listener as OnPlayCallback)(result)
+				})
+				this._isPlaying = true;
+			}
+		}
+
+		if (keyPath == 'currentItem' && this._audioPlayer!.currentItem == null) {
+			this.stopTimer();
+			const result = new GeneralCallbackResultImpl('停止')
+			this.InnerAudioContextOnStopCallbackArray.forEach(listener => {
+				(listener as InnerAudioContextOnStopCallback)(result)
+			})
+		}
+		if (keyPath == 'loadedTimeRanges') {
+			// 检查缓冲时间范围
+			const loadedTimeRanges = this._playerItem!.loadedTimeRanges;
+			if (loadedTimeRanges.length > 0) {
+				const timeRange = loadedTimeRanges.first!.timeRangeValue;
+				const start = CMTimeGetSeconds(timeRange.start);
+				const duration = CMTimeGetSeconds(timeRange.duration);
+				const end = start + duration;
+
+				// 估算当前可播放的时长
+				const currentTime = CMTimeGetSeconds(this._audioPlayer!.currentTime());
+				this._buffered = Number.from(end) - currentTime;
+
+				if (this._buffered < 0) {
+					// this._isBuffering = true;
+					const result = new GeneralCallbackResultImpl('缓冲中：' + this._buffered.toString())
+					this.OnWaitingCallbackArray.forEach(listener => {
+						(listener as OnWaitingCallback)(result)
+					})
+				} else {
+					// this._isBuffering = false;
+				}
+			}
+		}
+	}
+
+	private startObserving(obj : NSObject, keyPath : string, mode : number = 0) {
+		// 0 new, 1 new old, 2 new initial
+		obj.addObserver(
+			this,
+			forKeyPath = keyPath,
+			options = mode == 0
+				? NSKeyValueObservingOptions.new
+				: mode == 1
+					? [NSKeyValueObservingOptions.new, NSKeyValueObservingOptions.old]
+					: [NSKeyValueObservingOptions.new, NSKeyValueObservingOptions.initial],
+			context = null)
+			
+		this.observers.set(keyPath, obj)
+	}
+	private removeObserver() {
+
+	}
+	updateVolume(value : number) {
+		this.volume = value
+	}
+	set volume(value : number) {
+		try {
+			let volume = value;
+			if (volume > 1) {
+				volume = 1;
+			}
+			if (volume < 0) {
+				volume = 0;
+			}
+			this._volume = volume;
+			// 创建AVAudioMixInputParameters
+			const audioMixInputParams = new AVMutableAudioMixInputParameters(track = this._playerItem!.asset.tracks(withMediaType = AVMediaType.audio).first!);
+			// 设置音量
+			audioMixInputParams.setVolume(value.toFloat(), at = CMTime.zero);
+
+			// 创建AVAudioMix
+			const audioMix = new AVMutableAudioMix();
+
+			// 将AVAudioMixInputParameters添加到AVAudioMix
+			audioMix.inputParameters = [audioMixInputParams];
+
+			// 将AVAudioMix分配给AVPlayerItem
+			this._playerItem!.audioMix = audioMix;
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	updateObeyMuteSwitch(value : boolean) {
+		this.obeyMuteSwitch = value;
+	}
+	get obeyMuteSwitch() : boolean {
+		return this._obeyMuteSwitch;
+	}
+	set obeyMuteSwitch(value : boolean) {
+		this._obeyMuteSwitch = value;
+		if (!this._obeyMuteSwitch) {
+			// 设置AVAudioSession的category属性
+			const session = AVAudioSession.sharedInstance();
+			try {
+				UTSiOS.try(session.setCategory(AVAudioSession.Category.playback, options = AVAudioSession.CategoryOptions.mixWithOthers));
+			} catch (err) {
+				const error = err as Error;
+				this.handleException(10001, error.message);
+			}
+
+			// 设置AVAudioSession的mode属性
+			try {
+				UTSiOS.try(session.setMode(AVAudioSession.Mode.default));
+			} catch (err) {
+				const error = err as Error;
+				this.handleException(10001, error.message);
+			}
+
+			// 激活AVAudioSession
+			try {
+				UTSiOS.try(session.setActive(true, options = AVAudioSession.SetActiveOptions.notifyOthersOnDeactivation));
+			} catch (err) {
+				const error = err as Error;
+				this.handleException(10001, error.message);
+			}
+		}
+	}
+	get volume() : number {
+		return this._volume
+	}
+	updateLoop(isLooping : boolean) {
+		this._loop = isLooping
+	}
+	get loop() : boolean {
+		return this._loop
+	}
+	set loop(isLooping : boolean) {
+		this._loop = isLooping
+	}
+	get buffered() : number {
+		return this._buffered
+	}
+	get currentTime() : number {
+		try {
+			return this._currentTime;
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	updateCurrentTime(s : number) {
+		this.currentTime = s
+	}
+	set currentTime(s : number) {
+		this.seek(s);
+	}
+	get duration() : number {
+		try {
+			return this._duration;
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	get paused() : boolean {
+		try {
+			return !this._isPlaying;
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+			return false;
+		}
+	}
+	@objc private playerItemDidReachEnd(notification : Notification) {
+		if (notification.object != null && notification.object instanceof AVPlayerItem && (notification.object as AVPlayerItem) == this._audioPlayer!.currentItem) {
+			const res = new GeneralCallbackResultImpl('播放完毕')
+			this.OnEndedCallbackArray.forEach(listener => {
+				(listener as OnEndedCallback)(res)
+			})
+
+		}
+	}
+	private _removeNotificationAndObserver() {
+		this.observers.forEach((obj, key) => {
+			obj.removeObserver(this, forKeyPath = key)
+		})
+		NotificationCenter.default.removeObserver(this)
+		this.observers.clear()
+	}
+	private _setPlayerItem() {
+		try {
+			this.stop()
+			// 移除历史监听器
+			this._removeNotificationAndObserver();
+			this.createCheckSeekingStatusTimer();
+			this._playerItem = null
+			if (this._src.startsWith("http")) {
+				const url = new URL(string = this._src);
+				this._playerItem = new AVPlayerItem(url = url!);
+			} else {
+				const url = new URL(fileURLWithPath = this._src);
+				this._playerItem = new AVPlayerItem(url = url);
+			}
+			this._audioPlayer!.replaceCurrentItem(with = this._playerItem!);
+			
+			const method = new Selector('playerItemDidReachEnd:');
+			// 注册通知监听器
+			NotificationCenter.default.addObserver(this, selector = method, name = Notification.Name.AVPlayerItemDidPlayToEndTime, object = this._playerItem!);
+			// 监听AVPlayerItem的状态变化
+			this.startObserving(this._playerItem!, "status", 2)
+			this.startObserving(this._audioPlayer!, "rate")
+			this.startObserving(this._audioPlayer!, "currentItem", 1)
+			this.startObserving(this._playerItem!, "loadedTimeRanges", 2)
+
+			// 监听播放进度变化
+			this._audioPlayer!.addPeriodicTimeObserver(
+				forInterval = new CMTime(seconds = 1,
+					preferredTimescale = CMTimeScale(600)),
+				queue = DispatchQueue.main,
+				using = (cmtime : CMTime) => {
+					this._currentTime = Math.floor(cmtimeToSeconds(cmtime, false) * 1000000) / 1000000;
+					const res = new GeneralCallbackResultImpl(`播放进度: ${this._currentTime}`)
+					this.OnTimeUpdateCallbackArray.forEach(listener => {
+						(listener as OnTimeUpdateCallback)(res)
+					})
+				})
+
+		} catch (e) {
+			const result = new InnerAudioContextOnErrorListenerResultImpl(-1)
+			this.InnerAudioContextOnErrorCallbackArray.forEach(listener => {
+				(listener as InnerAudioContextOnErrorCallback)(result)
+			})
+		}
+	}
+	updateSrc(src : string) {
+		this.src = src
+	}
+	set src(v : string) {
+		try {
+			let path = v;
+			if (path.startsWith("file://")) {
+				path = path.substring(7)
+			} else if (!path.startsWith("/var/") && !path.startsWith("http")) {
+				path = UTSiOS.getResourcePath(path);
+			}
+			this._src = path
+			this._setPlayerItem();
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+
+	}
+	get src() : string {
+		return this._src
+	}
+	get startTime() : number {
+		return this._startTime;
+	}
+	set startTime(value : number) {
+		this._startTime = value;
+		// 这里是快进快退的逻辑
+		this.seek(value);
+	}
+	updateStartTime(value : number) {
+		this.startTime = value;
+	}
+	updatePlaybackRate(rate : number) {
+		this.playbackRate = rate
+	}
+	set playbackRate(rate : number) {
+		try {
+			if (rate >= 0.5 && rate <= 2.0) {
+				this._playbackRate = rate;
+				// 这里是设置播放速度的逻辑
+				this._audioPlayer!.rate = this._playbackRate.toFloat();
+			}
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	get playbackRate() : number {
+		return this._playbackRate
+	}
+	destroy() {
+		// 释放MediaPlayer对象
+		this.stopTimer()
+		this.OnCanplayCallbackArray.clear()
+		this.OnEndedCallbackArray.clear()
+		this.InnerAudioContextOnStopCallbackArray.clear()
+		this.InnerAudioContextOnErrorCallbackArray.clear()
+		this.OnPauseCallbackArray.clear()
+		this.OnPlayCallbackArray.clear()
+		this.OnSeekedCallbackArray.clear()
+		this.OnSeekingCallbackArray.clear()
+		this.OnTimeUpdateCallbackArray.clear()
+		this.OnWaitingCallbackArray.clear()
+
+		this._audioPlayer!.pause();
+		this._audioPlayer!.replaceCurrentItem(with = null);
+		// this._audioPlayer!.removeObserver(this, forKeyPath = 'status');
+		this._audioPlayer!.removeTimeObserver(this);
+		this._timer!.invalidate();
+		this._timer = null;
+		this._audioPlayer = null;
+	}
+	offCanplay() : void
+	offCanplay(listener ?: OnCanplayCallback) {
+		if (listener == null) {
+			// this.OnCanplayCallbackArray = []
+			this.OnCanplayCallbackArray.clear()
+		} else {
+			this.OnCanplayCallbackArray.delete(listener)
+			// this.OnCanplayCallbackArray = this.OnCanplayCallbackArray.filter(
+			// 	(callback:OnCanplayCallback) : boolean => callback != listener
+			// );
+		}
+	}
+	offEnded() : void
+	offEnded(listener ?: OnEndedCallback) {
+		if (listener == null) {
+			// this.OnEndedCallbackArray = []
+			this.OnEndedCallbackArray.clear()
+		} else {
+			this.OnEndedCallbackArray.delete(listener)
+			// this.OnEndedCallbackArray = this.OnEndedCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offError() : void
+	offError(listener ?: InnerAudioContextOnErrorCallback) {
+		if (listener == null) {
+			// this.InnerAudioContextOnErrorCallbackArray = []
+			this.InnerAudioContextOnErrorCallbackArray.clear()
+		} else {
+			this.InnerAudioContextOnErrorCallbackArray.delete(listener)
+			// this.InnerAudioContextOnErrorCallbackArray = this.InnerAudioContextOnErrorCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offPause() : void
+	offPause(listener ?: OnPauseCallback) {
+
+		if (listener == null) {
+			// this.OnPauseCallbackArray = []
+			this.OnPauseCallbackArray.clear()
+		} else {
+			this.OnPauseCallbackArray.delete(listener)
+			// this.OnPauseCallbackArray = this.OnPauseCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offPlay() : void
+	offPlay(listener ?: OnPlayCallback) {
+		if (listener == null) {
+			// this.OnPlayCallbackArray = []
+			this.OnPlayCallbackArray.clear()
+		} else {
+			this.OnPlayCallbackArray.delete(listener)
+			// this.OnPlayCallbackArray = this.OnPlayCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offSeeked() : void
+	offSeeked(listener ?: OnSeekedCallback) {
+		if (listener == null) {
+			// this.OnSeekedCallbackArray = []
+			this.OnSeekedCallbackArray.clear()
+		} else {
+			this.OnSeekedCallbackArray.delete(listener)
+			// this.OnSeekedCallbackArray = this.OnSeekedCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offSeeking() : void
+	offSeeking(listener ?: OnSeekingCallback) {
+		if (listener == null) {
+			// this.OnSeekingCallbackArray = []
+			this.OnSeekingCallbackArray.clear()
+		} else {
+			this.OnSeekingCallbackArray.delete(listener)
+			// this.OnSeekingCallbackArray = this.OnSeekingCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offStop() : void
+	offStop(listener ?: InnerAudioContextOnStopCallback) {
+		if (listener == null) {
+			// this.InnerAudioContextOnStopCallbackArray = []
+			this.InnerAudioContextOnStopCallbackArray.clear()
+		} else {
+			this.InnerAudioContextOnStopCallbackArray.delete(listener)
+			// this.InnerAudioContextOnStopCallbackArray = this.InnerAudioContextOnStopCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offTimeUpdate() : void
+	offTimeUpdate(listener ?: OnTimeUpdateCallback) {
+		if (listener == null) {
+			// this.OnTimeUpdateCallbackArray = []
+			this.OnTimeUpdateCallbackArray.clear()
+		} else {
+			this.OnTimeUpdateCallbackArray.delete(listener)
+			// this.OnTimeUpdateCallbackArray = this.OnTimeUpdateCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	offWaiting() : void
+	offWaiting(listener ?: OnWaitingCallback) {
+		if (listener == null) {
+			// this.OnWaitingCallbackArray = []
+			this.OnWaitingCallbackArray.clear()
+		} else {
+			this.OnWaitingCallbackArray.delete(listener)
+			// this.OnWaitingCallbackArray = this.OnWaitingCallbackArray.filter(
+			// 	(callback) : boolean => callback !== listener
+			// );
+		}
+	}
+	onCanplay(listener : OnCanplayCallback) {
+		this.OnCanplayCallbackArray.add(listener)
+	}
+	onEnded(listener : OnEndedCallback) {
+		this.OnEndedCallbackArray.add(listener)
+	}
+	onError(listener : InnerAudioContextOnErrorCallback) {
+		this.InnerAudioContextOnErrorCallbackArray.add(listener)
+	}
+	onPause(listener : OnPauseCallback) {
+		this.OnPauseCallbackArray.add(listener)
+	}
+	onPlay(listener : OnPlayCallback) {
+		this.OnPlayCallbackArray.add(listener)
+	}
+	onSeeked(listener : OnSeekedCallback) {
+		this.OnSeekedCallbackArray.add(listener)
+	}
+	onSeeking(listener : OnSeekingCallback) {
+		this.OnSeekingCallbackArray.add(listener)
+	}
+	onStop(listener : InnerAudioContextOnStopCallback) {
+		this.InnerAudioContextOnStopCallbackArray.add(listener)
+		this.stopTimer()
+	}
+	// @escaping
+	onTimeUpdate(listener : OnTimeUpdateCallback) {
+		this.OnTimeUpdateCallbackArray.add(listener)
+	}
+	onWaiting(listener : OnWaitingCallback) {
+		this.OnWaitingCallbackArray.add(listener)
+	}
+	pause() {
+		try {
+			this._audioPlayer!.pause();
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	play() {
+		try {
+			this._audioPlayer!.play();
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	seek(position : number) {
+		try {
+			this._audioPlayer!.seek(
+				to = new CMTime(seconds = position.toDouble(),
+					preferredTimescale = CMTimeScale(600)),
+				completionHandler = (_ : boolean) => {
+					this._lastPosition = this._audioPlayer!.currentTime();
+					const res = new GeneralCallbackResultImpl('跳转完毕')
+					this.OnSeekedCallbackArray.forEach(listener => {
+						(listener as OnSeekedCallback)(res)
+					})
+				});
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	stop() {
+		try {
+			this._audioPlayer!.pause();
+			this._audioPlayer!.replaceCurrentItem(with = null);
+		} catch (err) {
+			const error = err as Error;
+			this.handleException(10001, error.message);
+		}
+	}
+	setAudioOutput(outputType : number) {
+		
+	}
+}
+
+
+export function createInnerAudioContext() : InnerAudioContext {
+	return new InnerAudioContextImpl()
+}

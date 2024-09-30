@@ -1,0 +1,19 @@
+export * from '../interface'
+// export * from './manager'
+// import {InnerAudioContext} from '../interface'
+export {createInnerAudioContext} from './manager'
+
+// import { IAudioPlayer } from "../interface";
+// import { AudioPlayerManager } from "./audioPlayerManager";
+
+// export const createAudioPlayer = (): IAudioPlayer => {
+// 	return new AudioPlayerManager();
+// }
+
+
+// export function createInnerAudioContext() : InnerAudioContext {
+// 	return new InnerAudioContextImpl()
+// }
+// export function createInnerAudioContext(): InnerAudioContext {
+// 	return new InnerAudioContextImpl()
+// }

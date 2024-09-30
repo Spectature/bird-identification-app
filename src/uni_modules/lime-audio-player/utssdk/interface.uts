@@ -1,0 +1,391 @@
+
+export interface GeneralCallbackResult  {
+	/** 错误信息 */
+	errMsg : string
+}
+// export type InnerAudioContextOnErrorListenerResult = {
+// 	/** 可选值：
+// 	 * - 10001: 系统错误;
+// 	 * - 10002: 网络错误;
+// 	 * - 10003: 文件错误;
+// 	 * - 10004: 格式错误;
+// 	 * - -1: 未知错误; */
+// 	errCode : 10001 | 10002 | 10003 | 10004 | -1
+// 	errMsg : string
+// }
+export type ErrorCode = 10001 | 10002 | 10003 | 10004 | -1
+export interface InnerAudioContextOnErrorListenerResult {
+	errCode: number
+	errMsg : string
+}
+/**
+ * 公共回调
+ */
+export type OnCommonCallback = () => void
+
+// type Callback = (res : GeneralCallbackResult) => void
+type Callback = (res:any) => void
+/** onCanplay 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffCanplayCallback = (res : GeneralCallbackResult) => void
+/** onEnded 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffEndedCallback = (res : GeneralCallbackResult) => void
+/** onError 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type InnerAudioContextOffErrorCallback = (
+	result : InnerAudioContextOnErrorListenerResult
+) => void
+/** onPause 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffPauseCallback = (res : GeneralCallbackResult) => void
+/** onPlay 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffPlayCallback = (res : GeneralCallbackResult) => void
+/** onSeeked 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffSeekedCallback = (res : GeneralCallbackResult) => void
+/** onSeeking 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffSeekingCallback = (res : GeneralCallbackResult) => void
+/** onStop 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffStopCallback = (res : GeneralCallbackResult) => void
+/** onTimeUpdate 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffTimeUpdateCallback = (res : GeneralCallbackResult) => void
+/** onWaiting 传入的监听函数。不传此参数则移除所有监听函数。 */
+export type OffWaitingCallback = (res : GeneralCallbackResult) => void
+export type OnCanplayCallback = (res : GeneralCallbackResult) => void
+export type OnEndedCallback = (res : GeneralCallbackResult) => void
+/** 音频播放错误事件的监听函数 */
+export type InnerAudioContextOnErrorCallback = (
+	result : InnerAudioContextOnErrorListenerResult
+) => void
+
+export type OnPauseCallback = (res : GeneralCallbackResult) => void
+export type OnPlayCallback = (res : GeneralCallbackResult) => void
+export type OnSeekedCallback = (res : GeneralCallbackResult) => void
+export type OnSeekingCallback = (res : GeneralCallbackResult) => void
+export type InnerAudioContextOnStopCallback = (res : GeneralCallbackResult) => void
+export type OnTimeUpdateCallback = (res : GeneralCallbackResult) => void
+/** 音频加载中事件的监听函数 */
+export type OnWaitingCallback = (res : GeneralCallbackResult) => void
+
+
+// export interface InnerAudioContext2 {
+// 	/** 是否自动开始播放，默认为 `false` */
+// 	setAutoplayState(state: boolean):void
+// 	autoplay : boolean
+// 	setSource(url: string):void
+// 	src: string
+// }
+export interface InnerAudioContext {
+
+	/** 是否自动开始播放，默认为 `false` */
+	// setAutoplayState(state: boolean):void
+	// #ifdef APP-IOS
+	updateAutoplay(v : boolean) : void
+	// #endif
+	autoplay : boolean
+	/** 音频缓冲的时间点，仅保证当前播放时间点到此时间点内容已缓冲（只读） */
+	readonly buffered : number
+	/** 当前音频的播放位置（单位 s）。只有在当前有合法的 src 时返回，时间保留小数点后 6 位（currentTime 开始可读可写，改变 currentTime 值等同于调用 seek） */
+	currentTime : number
+	/** 当前音频的长度（单位 s）。只有在当前有合法的 src 时返回（只读） */
+	readonly duration : number
+	/** 是否循环播放，默认为 `false` */
+	// #ifdef APP-IOS
+	updateLoop(isLooping : boolean) : void
+	// #endif
+	loop : boolean
+	/** 是否遵循系统静音开关，默认为 `true`。当此参数为 `false` 时，即使用户打开了静音开关，也能继续发出声音。
+	 */
+	obeyMuteSwitch : boolean
+	/** 当前是是否暂停或停止状态（只读） */
+	readonly paused : boolean
+	/**
+	 * 播放速度。范围 0.5-2.0，默认为 1。（Android 需要 6 及以上版本） */
+	// #ifdef APP-IOS
+	updatePlaybackRate(rate : number) : void
+	// #endif
+	playbackRate : number
+	/** 
+	 * `origin`: 发送完整的referrer; `no-referrer`: 不发送。格式固定为 `https://servicewechat.com/{appid}/{version}/page-frame.html`，其中 {appid} 为小程序的 appid，{version} 为小程序的版本号，版本号为 0 表示为开发版、体验版以及审核版本，版本号为 devtools 表示为开发者工具，其余为正式版本； */
+	referrerPolicy : string
+	/** 音频资源的地址，用于直接播放 */
+	// #ifdef APP-IOS
+	updateSrc(src : string) : void
+	// #endif
+	src : string
+	/** 开始播放的位置（单位：s），默认为 0 */
+	// #ifdef APP-IOS
+	updateStartTime(value: number) :void
+	// #endif
+	startTime : number
+	
+	/** 需要基础库： `1.9.90`
+	 *
+	 * 音量。范围 0~1。默认为 1 */
+	 // #ifdef APP-IOS
+	updateVolume(volume : number) : void
+	// #endif
+	volume : number
+	/** 
+	 * 销毁当前实例 */
+	destroy() : void
+	/**
+* 移除音频进入可以播放状态的事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onCanplay(listener)
+InnerAudioContext.offCanplay(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offCanplay() : void
+	offCanplay(
+		/** onCanplay 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffCanplayCallback
+	) : void
+	/** 
+* 移除音频自然播放至结束的事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onEnded(listener)
+InnerAudioContext.offEnded(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offEnded() : void
+	offEnded(
+		/** onEnded 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffEndedCallback
+	) : void
+	/**
+* 移除音频播放错误事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onError(listener)
+InnerAudioContext.offError(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offError() : void
+	offError(
+		/** onError 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: InnerAudioContextOffErrorCallback
+	) : void
+	/** 
+* 移除音频暂停事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onPause(listener)
+InnerAudioContext.offPause(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offPause() : void
+	offPause(
+		/** onPause 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffPauseCallback
+	) : void
+	/** 
+* 移除音频播放事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onPlay(listener)
+InnerAudioContext.offPlay(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offPlay() : void
+	offPlay(
+		/** onPlay 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffPlayCallback
+	) : void
+	/**
+* 移除音频完成跳转操作的事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onSeeked(listener)
+InnerAudioContext.offSeeked(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offSeeked() : void
+	offSeeked(
+		/** onSeeked 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffSeekedCallback
+	) : void
+	/**
+* 移除音频进行跳转操作的事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onSeeking(listener)
+InnerAudioContext.offSeeking(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offSeeking() : void
+	offSeeking(
+		/** onSeeking 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffSeekingCallback
+	) : void
+	/**
+* 移除音频停止事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onStop(listener)
+InnerAudioContext.offStop(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offStop() : void
+	offStop(
+		/** onStop 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffStopCallback
+	) : void
+	/** 
+* 移除音频播放进度更新事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onTimeUpdate(listener)
+InnerAudioContext.offTimeUpdate(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offTimeUpdate() : void
+	offTimeUpdate(
+		/** onTimeUpdate 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffTimeUpdateCallback
+	) : void
+	/**
+* 移除音频加载中事件的监听函数
+*
+* **示例代码**
+*
+* ```js
+const listener = function (res) { console.log(res) }
+
+InnerAudioContext.onWaiting(listener)
+InnerAudioContext.offWaiting(listener) // 需传入与监听时同一个的函数对象
+``` */
+	offWaiting() : void
+	offWaiting(
+		/** onWaiting 传入的监听函数。不传此参数则移除所有监听函数。 */
+		listener ?: OffWaitingCallback
+	) : void
+	/**
+	 * 监听音频进入可以播放状态的事件。但不保证后面可以流畅播放 */
+	onCanplay(
+		/** 音频进入可以播放状态的事件的监听函数 */
+		listener : OnCanplayCallback
+	) : void
+	/**
+	 * 监听音频自然播放至结束的事件 */
+	onEnded(
+		/** 音频自然播放至结束的事件的监听函数 */
+		listener : OnEndedCallback
+	) : void
+	/**
+	 * 监听音频播放错误事件
+	 *
+	 * **Tips**
+	 *
+	 * 1. errCode=100001 时，如若 errMsg 中有 INNERCODE -11828 ，请先检查 response header 是否缺少 Content-Length
+	 * 2. errCode=100001 时，如若 errMsg 中有 systemErrCode:200333420，请检查文件编码格式和 fileExtension 是否一致 */
+	onError(
+		/** 音频播放错误事件的监听函数 */
+		listener : InnerAudioContextOnErrorCallback
+	) : void
+	/** 
+	 * 监听音频暂停事件 */
+	onPause(
+		/** 音频暂停事件的监听函数 */
+		listener : OnPauseCallback
+	) : void
+	/**
+	 * 监听音频播放事件 */
+	onPlay(
+		/** 音频播放事件的监听函数 */
+		listener : OnPlayCallback
+	) : void
+	/**
+	 * 监听音频完成跳转操作的事件 */
+	onSeeked(
+		/** 音频完成跳转操作的事件的监听函数 */
+		listener : OnSeekedCallback
+	) : void
+	/** 
+	 * 监听音频进行跳转操作的事件 */
+	onSeeking(
+		/** 音频进行跳转操作的事件的监听函数 */
+		listener : OnSeekingCallback
+	) : void
+	/** 
+	 * 在插件中使用：支持
+	 *
+	 * 监听音频停止事件 */
+	onStop(
+		/** 音频停止事件的监听函数 */
+		listener : InnerAudioContextOnStopCallback
+	) : void
+	/** 
+	 * 在插件中使用：支持
+	 *
+	 * 监听音频播放进度更新事件 */
+	onTimeUpdate(
+		/** 音频播放进度更新事件的监听函数 @escaping */
+		listener : OnTimeUpdateCallback
+	) : void
+	/** 
+	 *
+	 * 在插件中使用：支持
+	 *
+	 * 监听音频加载中事件。当音频因为数据不足，需要停下来加载时会触发 */
+	onWaiting(
+		/** 音频加载中事件的监听函数 */
+		listener : OnWaitingCallback
+	) : void
+	/** 
+	 *
+	 * 在插件中使用：支持
+	 *
+	 * 暂停。暂停后的音频再播放会从暂停处开始播放 */
+	pause() : void
+	/** 
+	 * 在插件中使用：支持
+	 *
+	 * 播放 */
+	play() : void
+	/** 
+	 *
+	 * 在插件中使用：支持
+	 *
+	 * 跳转到指定位置 */
+	seek(
+		/** 跳转的时间，单位 s。精确到小数点后 3 位，即支持 ms 级别精确度 */
+		position : number
+	) : void
+	/** 
+	 *
+	 * 在插件中使用：支持
+	 *
+	 * 停止。停止后的音频再播放会从头开始播放。 */
+	stop() : void
+	/**
+	 * 设置音频输出流类型。
+	 * @param outputType 音频输出类型，0 表示扬声器（外放），1 表示听筒。
+	 */
+	setAudioOutput(outputType : number):void
+}

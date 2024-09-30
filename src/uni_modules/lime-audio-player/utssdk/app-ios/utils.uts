@@ -1,0 +1,22 @@
+import { CMTime } from 'CoreMedia';
+
+/**
+ * CMTime转换为秒
+ * @param { CMTime } cmtime 需要转换的CMTime参数
+ */
+export function cmtimeToSeconds (cmtime: CMTime, floor: boolean = true): number {
+	const seconds = Number.from(cmtime.seconds);
+	
+	if (floor) {
+		return Math.floor(Number.from(cmtime.seconds));
+	}
+	
+	return seconds;
+}
+
+/**
+ * 打印
+ */
+export function log(value: any) {
+	console.log(`数据类型：${typeof value}，数据原始值：${value}`);
+}

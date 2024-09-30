@@ -1,32 +1,61 @@
 <script setup lang="ts">
-const tabSwitch = (item, index) => {
-  console.log(item, index);
-  updateValue(index);
+import { computed } from "@vue/runtime-core";
+
+const tabSwitch = (item: any, index: number) => {
+  switch (item.tabTitle) {
+    case "首页":
+      uni.navigateTo({
+        url: "/pages/index",
+      });
+      break;
+    case "ai识鸟":
+      uni.navigateTo({
+        url: "/pages/identification-bird",
+      });
+      break;
+    case "今日分享":
+      uni.navigateTo({
+        url: "/pages/index",
+      });
+      break;
+    case "鸟窝探秘":
+      uni.navigateTo({
+        url: "/pages/index",
+      });
+      break;
+    case "我的":
+      uni.navigateTo({
+        url: "/pages/index",
+      });
+      break;
+    default:
+      uni.navigateTo({
+        url: "/pages/index",
+      });
+      break;
+  }
 };
 
 // 定义组件的 props
 const props = defineProps({
-  modelValue: {
+  currentIndex: {
     type: Number,
     default: 0,
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
-
-// 更新值的方法
-const updateValue = (value) => {
-  emit("update:modelValue", value);
-};
+const innerIndex = computed(() => {
+  return props.currentIndex;
+});
 </script>
 
 <template>
-  <nut-tabbar @tab-switch="tabSwitch">
-    <nut-tabbar-item tab-title="标签" icon="home"></nut-tabbar-item>
-    <nut-tabbar-item tab-title="标签" icon="category"> </nut-tabbar-item>
-    <nut-tabbar-item tab-title="标签" icon="find"></nut-tabbar-item>
-    <nut-tabbar-item tab-title="标签" icon="cart"></nut-tabbar-item>
-    <nut-tabbar-item tab-title="标签" icon="my"></nut-tabbar-item>
+  <nut-tabbar v-model="innerIndex" @tab-switch="tabSwitch">
+    <nut-tabbar-item tab-title="首页" icon="home"></nut-tabbar-item>
+    <nut-tabbar-item tab-title="ai识鸟" icon="category"> </nut-tabbar-item>
+    <nut-tabbar-item tab-title="今日分享" icon="find"></nut-tabbar-item>
+    <nut-tabbar-item tab-title="鸟窝探秘" icon="cart"></nut-tabbar-item>
+    <nut-tabbar-item tab-title="我的" icon="my"></nut-tabbar-item>
   </nut-tabbar>
 </template>
 

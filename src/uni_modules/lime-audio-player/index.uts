@@ -1,0 +1,156 @@
+export * from '@/uni_modules/lime-audio-player/utssdk/interface'
+// #ifndef APP-IOS
+export * from '@/uni_modules/lime-audio-player'
+// #endif
+
+// #ifdef APP-IOS
+import { createInnerAudioContext as createInnerAudioContext2 } from '@/uni_modules/lime-audio-player';
+import { InnerAudioContext, OnPlayCallback, OnTimeUpdateCallback } from '@/uni_modules/lime-audio-player/utssdk/interface';
+
+class InnerAudioContextProxy {
+	iosContext: InnerAudioContext
+	constructor() {
+		this.iosContext = createInnerAudioContext2()
+	}
+	get autoplay():boolean {
+		return this.iosContext.autoplay
+	}
+	set autoplay(v: boolean) {
+		this.iosContext.updateAutoplay(v)
+	}
+	get buffered():number {
+		return this.iosContext.buffered
+	}
+	get duration():number {
+		return this.iosContext.duration
+	}
+	get loop():boolean {
+		return this.iosContext.loop
+	}
+	set loop(v: boolean) {
+		this.iosContext.updateLoop(v)
+	}
+	obeyMuteSwitch:boolean = true
+	get paused(): boolean {
+		return this.iosContext.paused
+	}
+	get playbackRate():number {
+		return this.iosContext.playbackRate
+	}
+	set playbackRate(v: number) {
+		this.iosContext.updatePlaybackRate(v)
+	}
+	referrerPolicy : string = ''
+	
+	get src():string {
+		return this.iosContext.src
+	}
+	set src(v: string) {
+		this.iosContext.updateSrc(v)
+	}
+	get startTime():number {
+		return this.iosContext.startTime
+	}
+	set startTime(v:number) {
+		this.iosContext.updateStartTime(v)
+	}
+	get currentTime():number {
+		return this.iosContext.currentTime
+	}
+	get volume():number {
+		return this.iosContext.volume
+	}
+	set volume(v:number) {
+		this.iosContext.updateVolume(v)
+	}
+	destroy() {
+		this.iosContext.destroy()
+	}
+	offCanplay() : void
+	offCanplay(listener ?: OffCanplayCallback) {
+		this.iosContext.offCanplay(listener)
+	}
+	offEnded() : void
+	offEnded(listener ?: OffEndedCallback) {
+		this.iosContext.offEnded(listener)
+	}
+	offError() : void
+	offError(listener ?: InnerAudioContextOffErrorCallback) {
+		this.iosContext.offError(listener)
+	}
+	offPause() : void
+	offPause(listener ?: OffPauseCallback) {
+		this.iosContext.offPause(listener)
+	}
+	offPlay() : void
+	offPlay(listener ?: OffPlayCallback) {
+		this.iosContext.offPlay(listener)
+	}
+	offSeeked() : void
+	offSeeked(listener ?: OffSeekedCallback) {
+		this.iosContext.offSeeked(listener)
+	}
+	offSeeking() : void
+	offSeeking(listener ?: OffSeekingCallback) {
+		this.iosContext.offSeeking(listener)
+	}
+	offStop() : void
+	offStop(listener ?: OffStopCallback) {
+		this.iosContext.offStop(listener)
+	}
+	offTimeUpdate() : void
+	offTimeUpdate(listener ?: OffTimeUpdateCallback) {
+		this.iosContext.offTimeUpdate(listener)
+	}
+	offWaiting() : void
+	offWaiting(listener ?: OffWaitingCallback) {
+		this.iosContext.offWaiting(listener)
+	}
+	onCanplay(listener : OnCanplayCallback) {
+		this.iosContext.onCanplay(listener)
+	}
+	onEnded(listener : OnEndedCallback) {
+		this.iosContext.onEnded(listener)
+	}
+	onError(listener : InnerAudioContextOnErrorCallback) {
+		this.iosContext.onError(listener)
+	}
+	onPause(listener : OnPauseCallback) {
+		this.iosContext.onPause(listener)
+	}
+	onPlay(listener : OnPlayCallback) {
+		this.iosContext.onPlay(listener)
+	}
+	onSeeked(listener : OnSeekedCallback) {
+		this.iosContext.onSeeked(listener)
+	}
+	onSeeking(listener : OnSeekingCallback) {
+		this.iosContext.onSeeking(listener)
+	}
+	onStop(listener : InnerAudioContextOnStopCallback) {
+		this.iosContext.onStop(listener)
+	}
+	onTimeUpdate(listener : OnTimeUpdateCallback) {
+		this.iosContext.onTimeUpdate(listener)
+	}
+	onWaiting(listener : OnWaitingCallback) {
+		this.iosContext.onWaiting(listener)
+	}
+	pause(){
+		this.iosContext.pause()
+	}
+	play() {
+		this.iosContext.play()
+	}
+	seek(position : number) {
+		this.iosContext.seek(position)
+	}
+	stop() {
+		this.iosContext.stop()
+	}
+}
+
+export function createInnerAudioContext():InnerAudioContextProxy {
+	return new InnerAudioContextProxy()
+}
+// #endif

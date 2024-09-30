@@ -1,0 +1,48 @@
+/* 此规范为 uni 规范，可以按照自己的需要选择是否实现 */
+import { ErrorCode, InnerAudioContextOnErrorListenerResult, GeneralCallbackResult } from "./interface.uts"
+/**
+ * 错误主题
+ * 注意：错误主题一般为插件名称，每个组件不同，需要使用时请更改。
+ * [可选实现]
+ */
+export const UniErrorSubject = 'lime-audio-manager';
+
+
+/**
+ * 错误信息
+ * @UniError
+ * [可选实现]
+ */
+export const errorCodes : Map<ErrorCode, string> = new Map([
+  /**
+   * 错误码及对应的错误信息
+   */
+  [10001, '系统错误'],
+  [10002, '网络错误'],
+  [10003, '文件错误'],
+  [10004, '格式错误'],
+  [-1, '未知错误']
+]);
+
+
+/**
+ * 错误对象实现
+ */
+export class InnerAudioContextOnErrorListenerResultImpl extends UniError implements InnerAudioContextOnErrorListenerResult {
+  /**
+   * 错误对象构造函数
+   */
+  constructor(errCode : ErrorCode, errMsg: string|null = null) {
+    super();
+    this.errSubject = UniErrorSubject;
+    this.errCode = errCode;
+    this.errMsg = errMsg ?? errorCodes.get(errCode) ?? "";
+  }
+}
+
+export class GeneralCallbackResultImpl implements GeneralCallbackResult {
+	errMsg : string
+	constructor(errMsg: string) {
+		this.errMsg = errMsg
+	}
+}
