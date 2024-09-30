@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    NutSwiper: typeof import('nutui-uniapp/components/swiper/swiper.vue')['default']
+    NutSwiperItem: typeof import('nutui-uniapp/components/swiperitem/swiperitem.vue')['default']
     NutTabbar: typeof import('nutui-uniapp/components/tabbar/tabbar.vue')['default']
     NutTabbarItem: typeof import('nutui-uniapp/components/tabbaritem/tabbaritem.vue')['default']
     TabBar: typeof import('./src/components/tab-bar.vue')['default']
