@@ -18,6 +18,12 @@
       "style": {
         "transparentTitle": "always"
       }
+    },
+    {
+      "path": "pages/today-share",
+      "style": {
+        "transparentTitle": "always"
+      }
     }
   ]
 }

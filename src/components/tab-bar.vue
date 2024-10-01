@@ -15,7 +15,7 @@ const tabSwitch = (item: any, index: number) => {
       break;
     case "今日分享":
       uni.navigateTo({
-        url: "/pages/index",
+        url: "/pages/today-share",
       });
       break;
     case "鸟窝探秘":

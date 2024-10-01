@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { usePersistentConnection } from "@/methods/persistentConnection";
-import { onUnmounted } from "vue";
 import MediaLoader from "@/components/media-loader.vue";
 
 const isLoading = ref(false);
