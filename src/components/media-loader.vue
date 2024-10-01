@@ -12,33 +12,36 @@ const props = defineProps({
   },
 });
 
-const innerType = ref(props.type);
-const innerSrc = ref(props.src);
-
-watchEffect(() => {
-  innerType.value = props.type;
-  innerSrc.value = props.src;
+const innerType = computed(() => {
+  return props.type;
+});
+const innerSrc = computed(() => {
+  return props.src;
 });
 </script>
 
 <template>
   <view class="media-container">
-    <!--    &lt;!&ndash; 判断资源类型 &ndash;&gt;-->
-    <image
-      v-if="innerType === 'image'"
-      :src="innerSrc"
-      mode="aspectFit"
-      class="media"
-    ></image>
+    <view class="top">
+      <image
+        v-if="innerType === 'image'"
+        :src="innerSrc"
+        mode="aspectFit"
+        class="media"
+      ></image>
 
-    <video
-      v-else-if="innerType === 'video'"
-      :src="innerSrc"
-      controls
-      class="media"
-    ></video>
+      <video
+        v-else-if="innerType === 'video'"
+        :src="innerSrc"
+        controls
+        class="media"
+      ></video>
 
-    <!--    <audio-app v-else-if="innerType === 'audio'" />-->
+      <audio-app v-else-if="innerType === 'audio'" :src="innerSrc" />
+    </view>
+    <view class="bottom">
+      <view class="res"></view>
+    </view>
   </view>
 </template>
 

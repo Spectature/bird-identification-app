@@ -42,11 +42,14 @@ wss.on("connection", (ws, request) => {
   ws.on("close", () => {
     console.log("客户端已断开连接");
   });
+  // https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg
+  // http://vjs.zencdn.net/v/oceans.mp4
+  // http://music.163.com/song/media/outer/url?id=447925558.mp3
   // 向客户端发送一条消息
   ws.send(
     JSON.stringify({
-      type: "image",
-      url: "https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg",
+      type: "audio",
+      url: "http://music.163.com/song/media/outer/url?id=447925558.mp3",
     }),
   );
 });

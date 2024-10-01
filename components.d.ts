@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Audio: typeof import('./src/components/audio.vue')['default']
     AudioApp: typeof import('./src/components/audio-app.vue')['default']
     MediaLoader: typeof import('./src/components/media-loader.vue')['default']
     NutActionSheet: typeof import('nutui-uniapp/components/actionsheet/actionsheet.vue')['default']
