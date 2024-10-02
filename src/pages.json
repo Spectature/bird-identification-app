@@ -36,6 +36,18 @@
       "style": {
         "transparentTitle": "always"
       }
+    },
+    {
+      "path": "pages/myself",
+      "style": {
+        "transparentTitle": "always"
+      }
+    },
+    {
+      "path": "pages/my-bird",
+      "style": {
+        "transparentTitle": "always"
+      }
     }
   ]
 }

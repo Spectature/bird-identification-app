@@ -25,7 +25,7 @@ const tabSwitch = (item: any, index: number) => {
       break;
     case "我的":
       uni.navigateTo({
-        url: "/pages/index",
+        url: "/pages/myself",
       });
       break;
     default:

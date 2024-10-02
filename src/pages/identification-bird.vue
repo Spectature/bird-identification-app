@@ -53,6 +53,15 @@ const chooseItem = (itemParams: any) => {
       });
       break;
     case "拍照":
+      uni.chooseImage({
+        count: 1, // 可以选择图片的数量
+        sourceType: ["camera"], // 仅使用摄像头
+        success: function (res) {
+          const tempFilePaths = res.tempFilePaths; // 临时文件路径
+          console.log(tempFilePaths);
+          // 这里可以将图片上传到服务器
+        },
+      });
       break;
     case "从文件管理选择":
       break;

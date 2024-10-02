@@ -10,6 +10,7 @@ declare module 'vue' {
     AudioApp: typeof import('./src/components/audio-app.vue')['default']
     MediaLoader: typeof import('./src/components/media-loader.vue')['default']
     NutActionSheet: typeof import('nutui-uniapp/components/actionsheet/actionsheet.vue')['default']
+    NutAvatar: typeof import('nutui-uniapp/components/avatar/avatar.vue')['default']
     NutButton: typeof import('nutui-uniapp/components/button/button.vue')['default']
     NutEmpty: typeof import('nutui-uniapp/components/empty/empty.vue')['default']
     NutIcon: typeof import('nutui-uniapp/components/icon/icon.vue')['default']
