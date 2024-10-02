@@ -20,7 +20,7 @@ const tabSwitch = (item: any, index: number) => {
       break;
     case "鸟窝探秘":
       uni.navigateTo({
-        url: "/pages/index",
+        url: "/pages/explore-bird-nest",
       });
       break;
     case "我的":

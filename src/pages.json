@@ -24,6 +24,18 @@
       "style": {
         "transparentTitle": "always"
       }
+    },
+    {
+      "path": "pages/explore-bird-nest",
+      "style": {
+        "transparentTitle": "always"
+      }
+    },
+    {
+      "path": "pages/bird-search",
+      "style": {
+        "transparentTitle": "always"
+      }
     }
   ]
 }

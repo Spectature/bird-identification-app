@@ -59,6 +59,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-4020820240925001",
     "@dcloudio/uni-mp-xhs": "3.0.0-4020820240925001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-4020820240925001",
+    "@stellaround/request": "^1.0.1",
     "@vueuse/core": "^11.1.0",
     "event-source-polyfill": "^1.0.31",
     "less": "^4.2.0",

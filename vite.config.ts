@@ -14,7 +14,23 @@ export default defineConfig({
     }),
     uni(),
     AutoImport({
-      imports: ["vue"],
+      imports: [
+        "vue",
+        {
+          "@stellaround/request": [
+            "publicRequests",
+            "useGet",
+            "usePost",
+            "usePut",
+            "useDelete",
+            "publicMock",
+            "mockGet",
+            "mockPost",
+            "mockPut",
+            "mockDelete",
+          ],
+        },
+      ],
       dts: "types/auto-imports.d.ts",
     }),
   ],
