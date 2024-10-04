@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import AudioApp from "../components/audio-app.vue";
 
 const props = defineProps({
@@ -19,17 +19,28 @@ const innerType = computed(() => {
 const innerSrc = computed(() => {
   return props.src;
 });
+
+// const showPreview = ref(false);
+const previewImg = (url: string) => {
+  uni.previewImage({
+    current: url, // 当前显示的图片链接
+    urls: [url], // 只预览这一张图片
+  });
+};
 </script>
 
 <template>
   <view class="media-container">
     <view class="top">
-      <image
-        v-if="innerType === 'image'"
-        :src="innerSrc"
-        mode="aspectFit"
-        class="media"
-      ></image>
+      <view v-if="innerType === 'image'">
+        <image
+          :src="innerSrc"
+          mode="aspectFit"
+          class="media"
+          @click="previewImg(innerSrc)"
+        >
+        </image>
+      </view>
 
       <video
         v-else-if="innerType === 'video'"
@@ -40,6 +51,7 @@ const innerSrc = computed(() => {
 
       <audio-app v-else-if="innerType === 'audio'" :src="innerSrc" />
     </view>
+
     <view class="bottom">
       <view class="res"></view>
     </view>

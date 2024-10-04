@@ -3,18 +3,39 @@ import { ref } from "vue";
 import MediaLoader from "../components/media-loader.vue";
 import TabBar from "../components/tab-bar.vue";
 
-const type = ref("");
-const src = ref("");
+const result = ref([
+  {
+    type: "image",
+    src: "https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg",
+    content: "1",
+  },
+  {
+    type: "image",
+    src: "https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg",
+    content: "2",
+  },
+  {
+    type: "image",
+    src: "https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg",
+    content: "3",
+  },
+]);
 </script>
 
 <template>
   <view class="container">
-    <view class="top">
-      <view class="top">
-        <media-loader :type="type" :src="src"></media-loader>
-      </view>
-      <view class="content"></view>
-    </view>
+    <nut-swiper :init-page="0" :loop="false" direction="vertical">
+      <nut-swiper-item v-for="(item, index) in result" :key="index">
+        <view class="top">
+          <view class="top">
+            <media-loader :type="item.type" :src="item.src"></media-loader>
+          </view>
+          <view class="content">
+            {{ item.content }}
+          </view>
+        </view>
+      </nut-swiper-item>
+    </nut-swiper>
 
     <view class="bottom"> <tab-bar :current-index="2"></tab-bar></view>
   </view>
@@ -26,5 +47,9 @@ const src = ref("");
   height: 100vh;
   flex-direction: column;
   justify-content: space-between;
+  .content {
+    display: flex;
+    justify-content: center;
+  }
 }
 </style>
