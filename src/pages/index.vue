@@ -52,7 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import TabBar from "@/components/tab-bar.vue";
+import TabBar from "../components/tab-bar.vue";
+import { onMounted, ref } from "vue";
 
 const swiperList = ref<string[]>([]);
 

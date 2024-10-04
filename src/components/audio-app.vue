@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
 import { createInnerAudioContext } from "@/uni_modules/lime-audio-player";
 
 type Song = {
@@ -84,7 +85,7 @@ const loadData = () => {
     //:RequestSuccess<UTSJSONObject>
     success(res) {
       console.log("成功", res);
-      const data = JSON.parse<ApiResponse>(JSON.stringify(res["data"]));
+      const data = JSON.parse(JSON.stringify(res["data"]));
       if (data != null && data.code == 200) {
         ctx.src = data.song_url;
         song.id = item.id;
@@ -108,7 +109,7 @@ const nextSong = () => {
 
 const bindAudioEventHandlers = () => {
   console.log("bindAudioEventHandlers");
-  ctx.onError((res) => {
+  ctx.onError((res: any) => {
     console.log("onError", res.errMsg);
     uni.showToast({
       title: res.errMsg,
@@ -116,23 +117,23 @@ const bindAudioEventHandlers = () => {
     });
     // nextSong()
   });
-  ctx.onPause((res) => {
+  ctx.onPause((res: any) => {
     console.log("onPause", res.errMsg);
   });
-  ctx.onPlay((res) => {
+  ctx.onPlay((res: any) => {
     console.log("onPlay", res.errMsg);
   });
-  ctx.onSeeked((res) => {
+  ctx.onSeeked((res: any) => {
     console.log("onSeeked", res.errMsg);
   });
-  ctx.onTimeUpdate((_) => {
+  ctx.onTimeUpdate((_: any) => {
     progress.value = ctx.currentTime * 1000;
   });
-  ctx.onCanplay((_) => {
+  ctx.onCanplay((_: any) => {
     duration.value = ctx.duration * 1000;
   });
 
-  ctx.onEnded((res) => {
+  ctx.onEnded((res: any) => {
     console.log("res", res.errMsg);
     nextSong();
   });
@@ -147,7 +148,7 @@ const unbindAudioEventHandlers = () => {
   ctx.offEnded();
   ctx.destroy();
 };
-const changeVolume = (e: UniSliderChangeEvent) => {
+const changeVolume = (e: any) => {
   console.log("音量", e.detail.value);
   ctx.volume = e.detail.value / 100;
   volume.value = e.detail.value;
@@ -163,7 +164,7 @@ const togglePlay = () => {
 const stopAudio = () => {
   ctx.stop();
 };
-const handleSeek = (e: UniSliderChangeEvent) => {
+const handleSeek = (e: any) => {
   console.log("跳到", e.detail.value);
   // ctx.seek(e.detail.value/1000);
 };

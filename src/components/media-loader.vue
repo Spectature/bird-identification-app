@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import AudioApp from "@/components/audio-app.vue";
+import { computed } from "vue";
+import AudioApp from "../components/audio-app.vue";
 
 const props = defineProps({
   type: {

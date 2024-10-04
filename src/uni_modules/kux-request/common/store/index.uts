@@ -1,0 +1,29 @@
+import { Interceptors, PendingRequests } from "../../utssdk/interface.uts";
+
+export type State = {
+	interceptors: Interceptors;
+	// pendingRequests: PendingRequests;
+};
+
+export const state = reactive({
+	interceptors: {
+		request: [],
+		requestReject: [],
+		response: [],
+		responseXhr: [],
+		responseReject: [],
+		requestSync: null,
+		requestRejectSync: null,
+		responseSync: null,
+		responseFail: [],
+	},
+	// pendingRequests: new Map<string, Promise<any>>(),
+} as State);
+
+export const setInterceptors = (interceptors: Interceptors) => {
+	state.interceptors = interceptors;
+};
+
+// export const setPendingRequest = (pendingRequests: PendingRequests) => {
+// 	state.pendingRequests = pendingRequests;
+// };

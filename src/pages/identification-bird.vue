@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import TabBar from "@/components/tab-bar.vue";
+import { ref } from "vue";
+import TabBar from "../components/tab-bar.vue";
 const sheetVisible = ref(false);
 const menuItems = [
   {

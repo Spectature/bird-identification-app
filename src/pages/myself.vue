@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import TabBar from "@/components/tab-bar.vue";
+import { ref, onMounted } from "vue";
+import TabBar from "../components/tab-bar.vue";
 
 const res = ref();
 

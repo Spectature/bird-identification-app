@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import MediaLoader from "@/components/media-loader.vue";
-import TabBar from "@/components/tab-bar.vue";
+import { ref } from "vue";
+import MediaLoader from "../components/media-loader.vue";
+import TabBar from "../components/tab-bar.vue";
 
 const type = ref("");
 const src = ref("");

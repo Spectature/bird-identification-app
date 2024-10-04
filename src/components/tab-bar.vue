@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "@vue/runtime-core";
+import { computed } from "vue";
 
 const tabSwitch = (item: any, index: number) => {
   switch (item.tabTitle) {
@@ -50,7 +50,7 @@ const innerIndex = computed(() => {
 </script>
 
 <template>
-  <nut-tabbar v-model="innerIndex" @tab-switch="tabSwitch">
+  <nut-tabbar :model-value="innerIndex" @tab-switch="tabSwitch">
     <nut-tabbar-item tab-title="首页" icon="home"></nut-tabbar-item>
     <nut-tabbar-item tab-title="ai识鸟" icon="category"> </nut-tabbar-item>
     <nut-tabbar-item tab-title="今日分享" icon="find"></nut-tabbar-item>

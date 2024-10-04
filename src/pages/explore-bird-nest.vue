@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import TabBar from "@/components/tab-bar.vue";
-import MediaLoader from "@/components/media-loader.vue";
+import { ref } from "vue";
+import TabBar from "../components/tab-bar.vue";
+import MediaLoader from "../components/media-loader.vue";
 import { onLoad } from "@dcloudio/uni-app";
 
 const type = ref("");
 const src = ref("");
 
-const res = ref();
+const result = ref();
 
 let id;
 
@@ -14,9 +15,32 @@ onLoad(async (query: any) => {
   id = query.id;
   // 有id是从详情页跳转过来的，没有则是需要初始化，那返回呢？
   if (id) {
-    res.value = await useGet("/aa", { id });
+    uni.request({
+      url: "/aa", // API 地址
+      method: "GET", // 使用 GET 方法
+      data: {
+        id,
+      },
+      success: (res) => {
+        result.value = res;
+        // console.log("成功:", res.data);
+      },
+      fail: (err) => {
+        console.error("请求失败:", err);
+      },
+    });
   } else {
-    res.value = await useGet("/bb");
+    uni.request({
+      url: "https://example.com/api", // API 请求地址
+      method: "GET", // 请求方式
+      success: (res) => {
+        result.value = res;
+        // console.log(res); // 请求成功后的返回数据
+      },
+      fail: (err) => {
+        console.error(err); // 请求失败时的错误信息
+      },
+    });
   }
 });
 
@@ -27,7 +51,7 @@ const jumpSearch = () => {
 };
 
 setTimeout(() => {
-  res.value = {
+  result.value = {
     name: "睚眦",
     family: "XX科",
     lang: "80cm",
@@ -49,26 +73,26 @@ setTimeout(() => {
       </view>
       <view class="content">
         <view class="top">
-          <view class="name">{{ res?.name }}</view>
-          <view class="family">{{ res?.family }}</view>
+          <view class="name">{{ result?.name }}</view>
+          <view class="family">{{ result?.family }}</view>
         </view>
         <view class="middle">
-          <view>{{ res?.lang }}</view>
-          <view>{{ res?.danger }}</view>
+          <view>{{ result?.lang }}</view>
+          <view>{{ result?.danger }}</view>
           <view>zhanwei</view>
         </view>
         <view class="list">
           <view class="list-item">
             <view class="title">特征一：</view>
-            <view>{{ res?.env }}</view>
+            <view>{{ result?.env }}</view>
           </view>
           <view class="list-item">
             <view class="title">特征一：</view>
-            <view> {{ res?.habits }}</view>
+            <view> {{ result?.habits }}</view>
           </view>
           <view class="list-item">
             <view class="title">特征一：</view>
-            <view> {{ res?.distribution }}</view>
+            <view> {{ result?.distribution }}</view>
           </view>
         </view>
       </view>
