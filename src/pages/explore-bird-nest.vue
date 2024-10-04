@@ -22,7 +22,7 @@ onLoad(async (query: any) => {
         id,
       },
       success: (res) => {
-        result.value = res;
+        // result.value = res;
         // console.log("成功:", res.data);
       },
       fail: (err) => {
@@ -34,7 +34,7 @@ onLoad(async (query: any) => {
       url: "https://example.com/api", // API 请求地址
       method: "GET", // 请求方式
       success: (res) => {
-        result.value = res;
+        // result.value = res;
         // console.log(res); // 请求成功后的返回数据
       },
       fail: (err) => {
@@ -51,52 +51,80 @@ const jumpSearch = () => {
 };
 
 setTimeout(() => {
-  result.value = {
-    name: "睚眦",
-    family: "XX科",
-    lang: "80cm",
-    danger: "一级",
-    env: "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
-    habits:
-      "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
-    distribution:
-      "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
-  };
-});
+  result.value = [
+    {
+      name: "睚眦1",
+      family: "XX科",
+      lang: "80cm",
+      danger: "一级",
+      env: "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      habits:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      distribution:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+    },
+    {
+      name: "睚眦2",
+      family: "XX科",
+      lang: "80cm",
+      danger: "一级",
+      env: "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      habits:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      distribution:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+    },
+    {
+      name: "睚眦3",
+      family: "XX科",
+      lang: "80cm",
+      danger: "一级",
+      env: "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      habits:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+      distribution:
+        "填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充填充",
+    },
+  ];
+}, 200);
 </script>
 
 <template>
   <view class="container">
-    <view class="top">
-      <view class="top">
-        <media-loader :type="type" :src="src"></media-loader>
-      </view>
-      <view class="content">
+    <nut-swiper :pagination-visible="false" :loop="false">
+      <nut-swiper-item v-for="(item, index) in result" :key="index">
         <view class="top">
-          <view class="name">{{ result?.name }}</view>
-          <view class="family">{{ result?.family }}</view>
-        </view>
-        <view class="middle">
-          <view>{{ result?.lang }}</view>
-          <view>{{ result?.danger }}</view>
-          <view>zhanwei</view>
-        </view>
-        <view class="list">
-          <view class="list-item">
-            <view class="title">特征一：</view>
-            <view>{{ result?.env }}</view>
+          <view class="top">
+            <media-loader :type="type" :src="src"></media-loader>
           </view>
-          <view class="list-item">
-            <view class="title">特征一：</view>
-            <view> {{ result?.habits }}</view>
-          </view>
-          <view class="list-item">
-            <view class="title">特征一：</view>
-            <view> {{ result?.distribution }}</view>
+          <view class="content">
+            <view class="top">
+              <view class="name">{{ item.name }}</view>
+              <view class="family">{{ item.family }}</view>
+            </view>
+            <view class="middle">
+              <view>{{ item.lang }}</view>
+              <view>{{ item.danger }}</view>
+              <view>zhanwei</view>
+            </view>
+            <view class="list">
+              <view class="list-item">
+                <view class="title">特征一：</view>
+                <view>{{ item.env }}</view>
+              </view>
+              <view class="list-item">
+                <view class="title">特征一：</view>
+                <view> {{ item.habits }}</view>
+              </view>
+              <view class="list-item">
+                <view class="title">特征一：</view>
+                <view> {{ item.distribution }}</view>
+              </view>
+            </view>
           </view>
         </view>
-      </view>
-    </view>
+      </nut-swiper-item>
+    </nut-swiper>
     <view class="bottom"> <tab-bar :current-index="3"></tab-bar></view>
     <view class="fixed" @click="jumpSearch">
       <nut-icon name="search" />
