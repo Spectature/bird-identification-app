@@ -85,7 +85,7 @@ const endTouch = () => {
       :loop="false"
       direction="vertical"
       :duration="500"
-      style="height: 100vh"
+      style="height: 100%"
       @change="dealChange"
     >
       <nut-swiper-item v-for="(item, index) in result" :key="index">
@@ -130,9 +130,17 @@ const endTouch = () => {
   height: 100vh;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
   .content {
     display: flex;
     justify-content: center;
+  }
+  .bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: lightcoral;
+    z-index: 10; /* 层级较高，显示在上面 */
   }
 }
 

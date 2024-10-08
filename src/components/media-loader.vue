@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, onMounted, nextTick } from "vue";
+import { computed, ref, onMounted } from "vue";
 import AudioApp from "../components/audio-app.vue";
 import { v4 as uuidv4 } from "uuid";
 import VideoApp from "@/components/video-app.vue";
@@ -34,48 +34,44 @@ const previewImg = (url: string) => {
   });
 };
 
-// const observerElement = ref(null);
-// const isVisible = ref(false);
-// const observerCallback = (entries: any) => {
-//   entries.forEach((entry: any) => {
-//     if (entry.isIntersecting) {
-//       isVisible.value = true;
-//       console.log("组件进入可视区");
-//     } else {
-//       isVisible.value = false;
-//       setAudioStop();
-//       console.log("组件离开可视区");
-//     }
-//   });
-// };
-//
-const className = ref();
-// let observer: any;
-// let obElement: any;
+function generateShortUUID() {
+  return uuidv4().split("-")[0]; // 取UUID的前一段
+}
 
-// onMounted(async () => {
-//   className.value = `media-${uuidv4()}`;
-//   observer = new IntersectionObserver(observerCallback, {
-//     root: null, // 默认是浏览器视口
-//     threshold: 0.1, // 当有 10% 进入视口时触发
-//   });
-//
-//   await nextTick();
-//   obElement = uni.getElementById(className.value);
-//   if (obElement) {
-//     observer.observe(obElement);
-//   }
-// });
-//
-// onUnmounted(() => {
-//   if (obElement) {
-//     observer.unobserve(obElement);
-//   }
-// });
+const className = ref(generateShortUUID());
+const observerElement = ref();
+
+onMounted(() => {
+  // 2. 创建 IntersectionObserver 实例
+  const observer = uni.createIntersectionObserver(this, {
+    thresholds: [0.01], // 设置可见性阈值,
+    // observeAll: true,
+  });
+
+  // 开始观察自身元素
+  observer.observe(`.media-container${className.value}`, (res) => {
+    // console.log("进入或离开可视区域:", res.intersectionRatio);
+    if (res.intersectionRatio > 0) {
+      console.log("元素在可视区域内");
+      console.log(className.value);
+    } else {
+      console.log("元素离开了可视区域");
+      console.log(className.value);
+    }
+  });
+
+  // onUnmounted(() => {
+  //   // 销毁观察器
+  //   observer.disconnect();
+  // });
+});
 </script>
 
 <template>
-  <view ref="observerElement" :id="className" class="media-container">
+  <view
+    ref="observerElement"
+    :class="['media-container', `media-container${className}`]"
+  >
     <view class="top">
       <view v-if="innerType === 'image'">
         <image
