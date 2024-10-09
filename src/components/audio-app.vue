@@ -91,11 +91,11 @@ const loadData = () => {
 
 const bindAudioEventHandlers = () => {
   ctx.onError((res: any) => {
-    console.log("onError", res.errMsg);
-    uni.showToast({
-      title: res.errMsg,
-      icon: "error",
-    });
+    console.log("onError", res);
+    // uni.showToast({
+    //   title: res.errMsg,
+    //   icon: "error",
+    // });
     // nextSong()
   });
 
@@ -140,10 +140,13 @@ const handleSeek = (e: any) => {
 };
 
 const setStop = () => {
-  console.log("audio stop", ctx.src);
-  ctx.stop();
-  ctx.seek(0);
-  isPlay.value = false;
+  if (isPlay.value) {
+    console.log("audio stop", ctx.src);
+    ctx.pause();
+    ctx.seek(0);
+    progress.value = 0;
+    isPlay.value = false;
+  }
 };
 
 defineExpose({

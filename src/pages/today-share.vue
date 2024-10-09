@@ -130,18 +130,18 @@ const endTouch = () => {
   height: 100vh;
   flex-direction: column;
   justify-content: space-between;
-  position: relative;
+  //position: relative;
   .content {
     display: flex;
     justify-content: center;
   }
-  .bottom {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background-color: lightcoral;
-    z-index: 10; /* 层级较高，显示在上面 */
-  }
+  //.bottom {
+  //  position: absolute;
+  //  bottom: 0;
+  //  width: 100%;
+  //  background-color: lightcoral;
+  //  z-index: 10; /* 层级较高，显示在上面 */
+  //}
 }
 
 //.swiper-container {
