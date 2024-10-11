@@ -13,6 +13,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  videoClass: {
+    type: String,
+    default: "",
+  },
 });
 
 const innerType = computed(() => {
@@ -21,9 +25,13 @@ const innerType = computed(() => {
 const innerSrc = computed(() => {
   return props.src;
 });
+const innerVideoClass = computed(() => {
+  return props.videoClass;
+});
 
 const audioRef = ref();
-const setAudioStop = () => {
+
+const setStop = () => {
   audioRef.value?.setStop();
 };
 
@@ -45,19 +53,18 @@ onMounted(() => {
   // 2. 创建 IntersectionObserver 实例
   const observer = uni.createIntersectionObserver(this, {
     thresholds: [0.1], // 设置可见性阈值,
-    // observeAll: true,
   });
 
   // 开始观察自身元素
   observer.observe(`.media-container${className.value}`, (res) => {
-    console.log("进入或离开可视区域:", res.intersectionRatio);
+    // console.log("进入或离开可视区域:", res.intersectionRatio);
     if (res.intersectionRatio > 0.1) {
-      console.log("元素在可视区域内");
-      console.log(className.value);
+      // console.log("元素在可视区域内");
+      // console.log(className.value);
     } else {
-      console.log("元素离开了可视区域");
-      setAudioStop();
-      console.log(className.value);
+      // console.log("元素离开了可视区域");
+      setStop();
+      // console.log(className.value);
     }
   });
 
@@ -85,12 +92,11 @@ onMounted(() => {
         </image>
       </view>
 
-      <video-app v-else-if="innerType === 'video'" :src="innerSrc"></video-app>
-      <!--      <video-->
-      <!--        v-else-if="innerType === 'video'"-->
-      <!--        :src="innerSrc"-->
-      <!--        class="media"-->
-      <!--      ></video>-->
+      <video-app
+        v-else-if="innerType === 'video'"
+        :src="innerSrc"
+        :video-class="innerVideoClass"
+      ></video-app>
 
       <audio-app
         ref="audioRef"
