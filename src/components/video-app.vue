@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-
-const onloadCode = ref();
+import { computed, ref } from "vue";
 
 const props = defineProps({
   src: {
     type: String,
     default: "",
   },
+  videoClass: {
+    type: String,
+    default: "",
+  },
+});
+const innerVideoClass = computed(() => {
+  return props.videoClass;
 });
 
 const iframeContent = computed(() => {
@@ -20,30 +25,23 @@ const iframeContent = computed(() => {
           width: 100%;
           height: auto;
         }
-        #poster {
-          display: none;
-        }
       </style>
     </head>
     <body style="margin: 0">
       <video id="video" class="media" controls></video>
-      <img id="poster" class="media" />
       <script>
         const video = document.getElementById('video');
-        const poster = document.getElementById('poster');
 
         video.src = '${props.src}';
         video.currentTime = 0.1;
-        // video.addEventListener('loadeddata', function() {
-        //   const canvas = document.createElement('canvas');
-        //   canvas.width = video.videoWidth;
-        //   canvas.height = video.videoHeight;
-        //   const context = canvas.getContext('2d');
-        //   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        //   poster.src = canvas.toDataURL('image/jpeg');
-        //   poster.style.display = 'block';
-        //   video.style.display = 'block';
-        // });
+
+         window.addEventListener("message", (event) => {
+           if(event.data === 'stop'){
+              video.pause()
+              video.currentTime = 0;
+           }
+        });
+
       <\/script>
     </body>
     </html>
@@ -53,7 +51,7 @@ const iframeContent = computed(() => {
 
 <template>
   <iframe
-    class="iframe"
+    :class="['iframe', innerVideoClass]"
     :srcdoc="iframeContent"
     style="height: 100%; width: 100%"
   ></iframe>
