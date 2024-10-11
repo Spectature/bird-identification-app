@@ -71,6 +71,7 @@
     "@dcloudio/uni-stacktracey": "3.0.0-4020920240930001",
     "@dcloudio/uni-uts-v1": "3.0.0-4020920240930001",
     "@dcloudio/vite-plugin-uni": "3.0.0-4020920240930001",
+    "@types/uuid": "^10.0.0",
     "@uni-helper/vite-plugin-uni-components": "^0.1.0",
     "@vue/runtime-core": "^3.4.21",
     "@vue/tsconfig": "^0.1.3",
