@@ -158,7 +158,6 @@ onMounted(() => {
 
   bindAudioEventHandlers();
   loadData();
-  console.log(111);
 });
 
 onPageHide(() => {
