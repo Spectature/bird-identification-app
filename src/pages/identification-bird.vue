@@ -4,13 +4,16 @@ import TabBar from "../components/tab-bar.vue";
 const sheetVisible = ref(false);
 const menuItems = [
   {
-    name: "从相册选择",
+    name: "选择图片",
   },
   {
     name: "拍照",
   },
   {
-    name: "从文件管理选择",
+    name: "选择视频",
+  },
+  {
+    name: "选择音频",
   },
 ];
 
@@ -64,7 +67,31 @@ const chooseItem = (itemParams: any) => {
         },
       });
       break;
-    case "从文件管理选择":
+    case "选择视频":
+      uni.chooseVideo({
+        sourceType: ["album"], // 从相册选择
+        success: (res) => {
+          console.log("chooseVideo success", JSON.stringify(res));
+        },
+        fail: (err) => {
+          uni.showModal({
+            title: "选择视频失败",
+            content: JSON.stringify(err),
+            showCancel: false,
+          });
+        },
+      });
+      break;
+    case "选择音频":
+      uni.chooseFile({
+        type: "all", // 选择音频文件
+        success: function (res) {
+          console.log("选择的音频文件：", res.tempFilePaths[0]); // 选中文件的路径
+        },
+        fail: function (err) {
+          console.log("文件选择失败：", err);
+        },
+      });
       break;
   }
 };
@@ -103,5 +130,8 @@ const chooseItem = (itemParams: any) => {
   height: 100vh;
   flex-direction: column;
   justify-content: space-between;
+  .middle {
+    margin-top: 200rpx;
+  }
 }
 </style>

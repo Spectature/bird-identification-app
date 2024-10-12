@@ -1,6 +1,6 @@
 {
-    "name" : "",
-    "appid" : "",
+    "name" : "com.bird",
+    "appid" : "__UNI__02080B9",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -38,12 +38,31 @@
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
-                ]
+                ],
+                "minSdkVersion" : 21
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "dSYMs" : false
+            },
             /* SDK配置 */
             "sdkConfigs" : {}
+        },
+        "nativePlugins" : {
+            "GW-ChooseFileModule" : {
+                "__plugin_info__" : {
+                    "name" : "文件选择 Android - [试用版，仅用于自定义调试基座]",
+                    "description" : "Android文件选择，支持Android 12及以上，支持多选、指定文件类型、搜索、排序。",
+                    "platforms" : "Android",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=10159",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : true,
+                    "bought" : 0,
+                    "pid" : "10159",
+                    "parameters" : {}
+                }
+            }
         }
     },
     /* 快应用特有相关 */
@@ -65,8 +84,8 @@
     "mp-toutiao" : {
         "usingComponents" : true
     },
-    "uniStatistics": {  
-        "enable": false
+    "uniStatistics" : {
+        "enable" : false
     },
     "vueVersion" : "3"
 }
