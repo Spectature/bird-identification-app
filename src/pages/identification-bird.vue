@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import TabBar from "../components/tab-bar.vue";
+
+const plugin = uni.requireNativePlugin("GW-ChooseFileModule");
 const sheetVisible = ref(false);
 const menuItems = [
   {
@@ -83,15 +85,14 @@ const chooseItem = (itemParams: any) => {
       });
       break;
     case "选择音频":
-      uni.chooseFile({
-        type: "all", // 选择音频文件
-        success: function (res) {
-          console.log("选择的音频文件：", res.tempFilePaths[0]); // 选中文件的路径
+      plugin.chooseFile(
+        {
+          count: 1,
         },
-        fail: function (err) {
-          console.log("文件选择失败：", err);
+        (res: any) => {
+          console.log(res);
         },
-      });
+      );
       break;
   }
 };

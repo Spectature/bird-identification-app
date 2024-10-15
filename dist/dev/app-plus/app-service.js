@@ -2743,6 +2743,7 @@ if (uni.restoreGlobal) {
     __name: "identification-bird",
     setup(__props, { expose: __expose }) {
       __expose();
+      const plugin = requireNativePlugin("GW-ChooseFileModule");
       const sheetVisible = vue.ref(false);
       const menuItems = [
         {
@@ -2770,16 +2771,16 @@ if (uni.restoreGlobal) {
           //   user: "test", // 如果需要传递其他数据，可以通过 formData 传递
           // },
           success: (uploadFileRes) => {
-            formatAppLog("log", "at pages/identification-bird.vue:29", "上传成功: ", uploadFileRes);
+            formatAppLog("log", "at pages/identification-bird.vue:31", "上传成功: ", uploadFileRes);
             if (uploadFileRes.statusCode === 200) {
               const data = JSON.parse(uploadFileRes.data);
-              formatAppLog("log", "at pages/identification-bird.vue:32", "后端返回的结果：", data);
+              formatAppLog("log", "at pages/identification-bird.vue:34", "后端返回的结果：", data);
             } else {
-              formatAppLog("error", "at pages/identification-bird.vue:34", "上传失败，状态码：", uploadFileRes.statusCode);
+              formatAppLog("error", "at pages/identification-bird.vue:36", "上传失败，状态码：", uploadFileRes.statusCode);
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/identification-bird.vue:38", "上传失败: ", err);
+            formatAppLog("error", "at pages/identification-bird.vue:40", "上传失败: ", err);
           }
         });
       };
@@ -2795,7 +2796,7 @@ if (uni.restoreGlobal) {
               // 从相册选择
               success: function(res) {
                 const tempFilePaths = res.tempFilePaths;
-                formatAppLog("log", "at pages/identification-bird.vue:52", tempFilePaths);
+                formatAppLog("log", "at pages/identification-bird.vue:54", tempFilePaths);
                 uni.navigateTo({
                   url: "/pages/result"
                 });
@@ -2810,7 +2811,7 @@ if (uni.restoreGlobal) {
               // 仅使用摄像头
               success: function(res) {
                 const tempFilePaths = res.tempFilePaths;
-                formatAppLog("log", "at pages/identification-bird.vue:65", tempFilePaths);
+                formatAppLog("log", "at pages/identification-bird.vue:67", tempFilePaths);
               }
             });
             break;
@@ -2819,7 +2820,7 @@ if (uni.restoreGlobal) {
               sourceType: ["album"],
               // 从相册选择
               success: (res) => {
-                formatAppLog("log", "at pages/identification-bird.vue:74", "chooseVideo success", JSON.stringify(res));
+                formatAppLog("log", "at pages/identification-bird.vue:76", "chooseVideo success", JSON.stringify(res));
               },
               fail: (err) => {
                 uni.showModal({
@@ -2831,20 +2832,18 @@ if (uni.restoreGlobal) {
             });
             break;
           case "选择音频":
-            uni.chooseFile({
-              type: "all",
-              // 选择音频文件
-              success: function(res) {
-                formatAppLog("log", "at pages/identification-bird.vue:89", "选择的音频文件：", res.tempFilePaths[0]);
+            plugin.chooseFile(
+              {
+                count: 1
               },
-              fail: function(err) {
-                formatAppLog("log", "at pages/identification-bird.vue:92", "文件选择失败：", err);
+              (res) => {
+                formatAppLog("log", "at pages/identification-bird.vue:93", res);
               }
-            });
+            );
             break;
         }
       };
-      const __returned__ = { sheetVisible, menuItems, uploadImg, chooseItem, TabBar };
+      const __returned__ = { plugin, sheetVisible, menuItems, uploadImg, chooseItem, TabBar };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
