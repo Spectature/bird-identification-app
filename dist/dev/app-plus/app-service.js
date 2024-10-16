@@ -3353,7 +3353,7 @@ if (uni.restoreGlobal) {
       </style>
     </head>
     <body style="margin: 0">
-      <video id="video" class="media" controls></video>
+      <video id="video" class="media" controls controlslist="nodownload noplaybackrate"></video>
       <script>
         const video = document.getElementById('video');
 

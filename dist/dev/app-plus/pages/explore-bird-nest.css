@@ -553,6 +553,12 @@ to {
 body[data-v-6cdea94a] {
   margin: 0;
 }
+#video[data-v-6cdea94a]::-webkit-media-controls-enclosure {
+  display: none;
+}
+uni-video[data-v-6cdea94a]::-webkit-media-controls {
+  display: none !important;
+}
 
 .media-container[data-v-f403e231] {
   display: flex;

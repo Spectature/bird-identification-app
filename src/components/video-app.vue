@@ -28,7 +28,7 @@ const iframeContent = computed(() => {
       </style>
     </head>
     <body style="margin: 0">
-      <video id="video" class="media" controls></video>
+      <video id="video" class="media" controls controlslist="nodownload noplaybackrate"></video>
       <script>
         const video = document.getElementById('video');
 
@@ -64,5 +64,12 @@ const iframeContent = computed(() => {
 }
 body {
   margin: 0;
+}
+
+#video::-webkit-media-controls-enclosure {
+  display: none;
+}
+video::-webkit-media-controls {
+  display: none !important;
 }
 </style>
