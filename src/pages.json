@@ -48,6 +48,12 @@
       "style": {
         "transparentTitle": "always"
       }
+    },
+    {
+      "path": "pages/register",
+      "style": {
+        "transparentTitle": "always"
+      }
     }
   ]
 }

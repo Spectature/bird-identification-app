@@ -34,6 +34,7 @@ if (uni.restoreGlobal) {
   const UPDATE_MODEL_EVENT = "update:modelValue";
   const UPDATE_VISIBLE_EVENT = "update:visible";
   const CHANGE_EVENT = "change";
+  const INPUT_EVENT = "input";
   const CLICK_EVENT = "click";
   const OPEN_EVENT = "open";
   const CLOSE_EVENT = "close";
@@ -41,6 +42,7 @@ if (uni.restoreGlobal) {
   const CLOSED_EVENT = "closed";
   const FOCUS_EVENT = "focus";
   const BLUR_EVENT = "blur";
+  const CONFIRM_EVENT = "confirm";
   const SEARCH_EVENT = "search";
   const CLEAR_EVENT = "clear";
   const CANCEL_EVENT = "cancel";
@@ -257,6 +259,40 @@ if (uni.restoreGlobal) {
   function getRandomId() {
     return Math.random().toString(36).slice(-8);
   }
+  function cloneDeep(obj, cache = /* @__PURE__ */ new WeakMap()) {
+    if (obj === null || typeof obj !== "object")
+      return obj;
+    if (cache.has(obj))
+      return cache.get(obj);
+    let clone;
+    if (obj instanceof Date) {
+      clone = new Date(obj.getTime());
+    } else if (obj instanceof RegExp) {
+      clone = new RegExp(obj);
+    } else if (obj instanceof Map) {
+      clone = new Map(Array.from(obj, ([key, value]) => [key, cloneDeep(value, cache)]));
+    } else if (obj instanceof Set) {
+      clone = new Set(Array.from(obj, (value) => cloneDeep(value, cache)));
+    } else if (Array.isArray(obj)) {
+      clone = obj.map((value) => cloneDeep(value, cache));
+    } else if (Object.prototype.toString.call(obj) === "[object Object]") {
+      clone = Object.create(Object.getPrototypeOf(obj));
+      cache.set(obj, clone);
+      for (const [key, value] of Object.entries(obj))
+        clone[key] = cloneDeep(value, cache);
+    } else {
+      clone = Object.assign({}, obj);
+    }
+    cache.set(obj, clone);
+    return clone;
+  }
+  function ifDefPlatform() {
+    let platform2;
+    platform2 = "APP-PLUS";
+    return platform2;
+  }
+  const platform = ifDefPlatform();
+  const isH5 = platform === "H5";
   const numericProp = [Number, String];
   const truthProp = {
     type: Boolean,
@@ -528,17 +564,17 @@ if (uni.restoreGlobal) {
     [CHANGE_EVENT]: (val) => isNumber(val)
   };
   const SWIPER_KEY = Symbol("swiper");
-  const componentName$f = `${PREFIX}-swiper`;
-  const __default__$d = vue.defineComponent({
-    name: componentName$f,
+  const componentName$h = `${PREFIX}-swiper`;
+  const __default__$f = vue.defineComponent({
+    name: componentName$h,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$d,
+  const _sfc_main$t = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$f,
     props: swiperProps,
     emits: swiperEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -561,21 +597,21 @@ if (uni.restoreGlobal) {
       });
       const touch = useTouch();
       const classes = vue.computed(() => {
-        const prefixCls = componentName$f;
+        const prefixCls = componentName$h;
         return {
           [prefixCls]: true
         };
       });
       const isVertical = vue.computed(() => props.direction === "vertical");
       const classesInner = vue.computed(() => {
-        const prefixCls = componentName$f;
+        const prefixCls = componentName$h;
         return {
           [`${prefixCls}-inner`]: true,
           [`${prefixCls}-vertical`]: isVertical.value
         };
       });
       const classesPagination = vue.computed(() => {
-        const prefixCls = componentName$f;
+        const prefixCls = componentName$h;
         return {
           [`${prefixCls}-pagination`]: true,
           [`${prefixCls}-pagination-vertical`]: isVertical.value
@@ -807,7 +843,7 @@ if (uni.restoreGlobal) {
           +val > 0 ? autoplay() : stopAutoPlay();
         }
       );
-      const __returned__ = { componentName: componentName$f, props, emit, instance, containerId, state, touch, classes, isVertical, classesInner, classesPagination, delTa, isCorrectDirection, childCount, size, trackSize, minOffset, activePagination, getStyle, internalChildren, getOffset, getActive, move, resettPosition, stopAutoPlay, jump, prev, next, to, autoplay, init, onTouchStart, onTouchMove, onTouchEnd };
+      const __returned__ = { componentName: componentName$h, props, emit, instance, containerId, state, touch, classes, isVertical, classesInner, classesPagination, delTa, isCorrectDirection, childCount, size, trackSize, minOffset, activePagination, getStyle, internalChildren, getOffset, getActive, move, resettPosition, stopAutoPlay, jump, prev, next, to, autoplay, init, onTouchStart, onTouchMove, onTouchEnd };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -819,7 +855,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       id: $setup.containerId,
       class: vue.normalizeClass([$setup.classes, _ctx.customClass]),
@@ -877,21 +913,21 @@ if (uni.restoreGlobal) {
       )) : vue.createCommentVNode("v-if", true)
     ], 46, ["catch-move"]);
   }
-  const __unplugin_components_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__scopeId", "data-v-d429ac3a"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/swiper/swiper.vue"]]);
+  const __unplugin_components_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["__scopeId", "data-v-d429ac3a"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/swiper/swiper.vue"]]);
   const swiperItemProps = {
     ...commonProps
   };
-  const componentName$e = `${PREFIX}-swiper-item`;
-  const __default__$c = vue.defineComponent({
-    name: componentName$e,
+  const componentName$g = `${PREFIX}-swiper-item`;
+  const __default__$e = vue.defineComponent({
+    name: componentName$g,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$c,
+  const _sfc_main$s = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$e,
     props: swiperItemProps,
     setup(__props, { expose: __expose }) {
       const props = __props;
@@ -900,7 +936,7 @@ if (uni.restoreGlobal) {
         offset: 0
       });
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$e);
+        return getMainClass(props, componentName$g);
       });
       const style = vue.computed(() => {
         const style2 = {};
@@ -915,12 +951,12 @@ if (uni.restoreGlobal) {
         state.offset = offset;
       }
       __expose({ setOffset });
-      const __returned__ = { componentName: componentName$e, props, parent, state, classes, style, setOffset };
+      const __returned__ = { componentName: componentName$g, props, parent, state, classes, style, setOffset };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -934,7 +970,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__scopeId", "data-v-8e0d26b2"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/swiperitem/swiperitem.vue"]]);
+  const __unplugin_components_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__scopeId", "data-v-8e0d26b2"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/swiperitem/swiperitem.vue"]]);
   const tabbarProps = {
     ...commonProps,
     /**
@@ -967,17 +1003,17 @@ if (uni.restoreGlobal) {
     [UPDATE_MODEL_EVENT]: (val) => isString(val) || isNumber(val)
   };
   const TABBAR_CONTEXT_KEY = Symbol("TABBAR_CONTEXT");
-  const componentName$d = `${PREFIX}-tabbar`;
-  const __default__$b = vue.defineComponent({
-    name: componentName$d,
+  const componentName$f = `${PREFIX}-tabbar`;
+  const __default__$d = vue.defineComponent({
+    name: componentName$f,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$b,
+  const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$d,
     props: tabbarProps,
     emits: tabbarEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -987,7 +1023,7 @@ if (uni.restoreGlobal) {
       const instance = vue.getCurrentInstance();
       const { getSelectorNodeInfo } = useSelectorQuery(instance);
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$d, {
+        return getMainClass(props, componentName$f, {
           "nut-tabbar-bottom": props.bottom,
           "nut-tabbar-safebottom": props.safeAreaInsetBottom
         });
@@ -1036,12 +1072,12 @@ if (uni.restoreGlobal) {
           }, 500);
         }
       });
-      const __returned__ = { componentName: componentName$d, props, emit, instance, getSelectorNodeInfo, classes, wrapperClasses, trulyHeight, wrapperStyles, parentData, changeIndex, fetchTrulyHeight };
+      const __returned__ = { componentName: componentName$f, props, emit, instance, getSelectorNodeInfo, classes, wrapperClasses, trulyHeight, wrapperStyles, parentData, changeIndex, fetchTrulyHeight };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1066,7 +1102,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-36e4f19c"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/tabbar/tabbar.vue"]]);
+  const __unplugin_components_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["__scopeId", "data-v-36e4f19c"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/tabbar/tabbar.vue"]]);
   const badgeProps = {
     ...commonProps,
     /**
@@ -1107,17 +1143,17 @@ if (uni.restoreGlobal) {
      */
     customColor: makeStringProp("")
   };
-  const componentName$c = `${PREFIX}-badge`;
-  const __default__$a = vue.defineComponent({
-    name: componentName$c,
+  const componentName$e = `${PREFIX}-badge`;
+  const __default__$c = vue.defineComponent({
+    name: componentName$e,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$a,
+  const _sfc_main$q = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$c,
     props: badgeProps,
     setup(__props, { expose: __expose }) {
       __expose();
@@ -1131,7 +1167,7 @@ if (uni.restoreGlobal) {
         });
       });
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$c);
+        return getMainClass(props, componentName$e);
       });
       const content = vue.computed(() => {
         if (props.dot)
@@ -1142,12 +1178,12 @@ if (uni.restoreGlobal) {
           return max < value ? `${max}+` : value;
         return value;
       });
-      const __returned__ = { componentName: componentName$c, props, getStyle, classes, content };
+      const __returned__ = { componentName: componentName$e, props, getStyle, classes, content };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1184,7 +1220,7 @@ if (uni.restoreGlobal) {
       /* CLASS */
     );
   }
-  const NutBadge = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-9ec2ecfa"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/badge/badge.vue"]]);
+  const NutBadge = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__scopeId", "data-v-9ec2ecfa"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/badge/badge.vue"]]);
   const iconProps = {
     ...commonProps,
     popClass: { type: String, default: "" },
@@ -1220,17 +1256,17 @@ if (uni.restoreGlobal) {
   const iconEmits = {
     [CLICK_EVENT]: (evt) => evt instanceof Object
   };
-  const componentName$b = `${PREFIX}-icon`;
-  const __default__$9 = vue.defineComponent({
-    name: componentName$b,
+  const componentName$d = `${PREFIX}-icon`;
+  const __default__$b = vue.defineComponent({
+    name: componentName$d,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$9,
+  const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$b,
     props: iconProps,
     emits: iconEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -1246,13 +1282,13 @@ if (uni.restoreGlobal) {
       const classes = vue.computed(() => {
         const obj = {};
         if (isImage.value) {
-          obj[`${componentName$b}__img`] = true;
+          obj[`${componentName$d}__img`] = true;
         } else {
           obj[props.fontClassName] = true;
           obj[`${props.classPrefix}-${props.name}`] = true;
           obj[props.popClass] = true;
         }
-        return getMainClass(props, componentName$b, obj);
+        return getMainClass(props, componentName$d, obj);
       });
       const getStyle = vue.computed(() => {
         const style = {
@@ -1263,12 +1299,12 @@ if (uni.restoreGlobal) {
         };
         return getMainStyle(props, style);
       });
-      const __returned__ = { componentName: componentName$b, props, emits, handleClick, isImage, classes, getStyle };
+      const __returned__ = { componentName: componentName$d, props, emits, handleClick, isImage, classes, getStyle };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
     return $setup.isImage ? (vue.openBlock(), vue.createElementBlock("image", {
       key: 0,
       class: vue.normalizeClass($setup.classes),
@@ -1288,7 +1324,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     ));
   }
-  const NutIcon = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-cd13477f"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/icon/icon.vue"]]);
+  const NutIcon = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__scopeId", "data-v-cd13477f"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/icon/icon.vue"]]);
   const tabbaritemProps = {
     ...commonProps,
     ...badgeProps,
@@ -1305,17 +1341,17 @@ if (uni.restoreGlobal) {
      */
     tabTitle: String
   };
-  const componentName$a = `${PREFIX}-tabbar-item`;
-  const __default__$8 = vue.defineComponent({
-    name: componentName$a,
+  const componentName$c = `${PREFIX}-tabbar-item`;
+  const __default__$a = vue.defineComponent({
+    name: componentName$c,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$8,
+  const _sfc_main$o = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$a,
     props: tabbaritemProps,
     setup(__props, { expose: __expose }) {
       __expose();
@@ -1337,7 +1373,7 @@ if (uni.restoreGlobal) {
         return innerValue.value === tabbarContext.modelValue;
       });
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$a, {
+        return getMainClass(props, componentName$c, {
           "nut-tabbar-item__icon--unactive": !isActive.value
         });
       });
@@ -1373,12 +1409,12 @@ if (uni.restoreGlobal) {
       vue.onBeforeUnmount(() => {
         unbindContext();
       });
-      const __returned__ = { componentName: componentName$a, props, slots, instance, tabbarContext, innerIndex, innerValue, isActive, classes, styles, triggerChange, bindContext, unbindContext, NutBadge, NutIcon };
+      const __returned__ = { componentName: componentName$c, props, slots, instance, tabbarContext, innerIndex, innerValue, isActive, classes, styles, triggerChange, bindContext, unbindContext, NutBadge, NutIcon };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1454,8 +1490,8 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-b4ec6fcd"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/tabbaritem/tabbaritem.vue"]]);
-  const _sfc_main$k = /* @__PURE__ */ vue.defineComponent({
+  const __unplugin_components_0$4 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-b4ec6fcd"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/tabbaritem/tabbaritem.vue"]]);
+  const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
     __name: "tab-bar",
     props: {
       currentIndex: {
@@ -1508,9 +1544,9 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_nut_tabbar_item = __unplugin_components_0$4;
-    const _component_nut_tabbar = __unplugin_components_1$1;
+    const _component_nut_tabbar = __unplugin_components_1$2;
     return vue.openBlock(), vue.createBlock(_component_nut_tabbar, {
       "model-value": $setup.innerIndex,
       onTabSwitch: $setup.tabSwitch
@@ -1541,8 +1577,8 @@ if (uni.restoreGlobal) {
       /* STABLE */
     }, 8, ["model-value"]);
   }
-  const TabBar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "D:/WebStormProject/bird-identification-app/src/components/tab-bar.vue"]]);
-  const _sfc_main$j = /* @__PURE__ */ vue.defineComponent({
+  const TabBar = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__file", "D:/WebStormProject/bird-identification-app/src/components/tab-bar.vue"]]);
+  const _sfc_main$m = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -1567,9 +1603,9 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_nut_swiper_item = __unplugin_components_0$5;
-    const _component_nut_swiper = __unplugin_components_1$2;
+    const _component_nut_swiper = __unplugin_components_1$3;
     return vue.openBlock(), vue.createElementBlock("view", { class: "content" }, [
       vue.createElementVNode("view", { class: "container" }, [
         vue.createElementVNode("view", { class: "top" }, [
@@ -1671,7 +1707,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesIndex = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-d1d3d0d7"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/index.vue"]]);
+  const PagesIndex = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-d1d3d0d7"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/index.vue"]]);
   const transitionProps = {
     ...commonProps,
     /**
@@ -1767,7 +1803,7 @@ if (uni.restoreGlobal) {
       leave: "nutZoomOut"
     }
   };
-  const componentName$9 = `${PREFIX}-transition`;
+  const componentName$b = `${PREFIX}-transition`;
   function isKeyOfAnimations(value) {
     const keys = Object.keys(defaultAnimations);
     return keys.includes(value);
@@ -1857,7 +1893,7 @@ if (uni.restoreGlobal) {
       emit(CLICK_EVENT, evt);
     }
     const classes = vue.computed(() => {
-      return getMainClass(props, componentName$9, {
+      return getMainClass(props, componentName$b, {
         [animationClass.value]: true,
         "nut-hidden": !display.value
       });
@@ -1875,17 +1911,17 @@ if (uni.restoreGlobal) {
       clickHandler
     };
   }
-  const componentName$8 = `${PREFIX}-transition`;
-  const __default__$7 = vue.defineComponent({
-    name: componentName$8,
+  const componentName$a = `${PREFIX}-transition`;
+  const __default__$9 = vue.defineComponent({
+    name: componentName$a,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$7,
+  const _sfc_main$l = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$9,
     props: transitionProps,
     emits: transitionEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -1893,12 +1929,12 @@ if (uni.restoreGlobal) {
       const props = __props;
       const emits = __emit;
       const { display, classes, clickHandler, styles } = useTransition(props, emits);
-      const __returned__ = { componentName: componentName$8, props, emits, display, classes, clickHandler, styles };
+      const __returned__ = { componentName: componentName$a, props, emits, display, classes, clickHandler, styles };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     return !$setup.props.destroyOnClose || $setup.display ? (vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1914,7 +1950,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     )) : vue.createCommentVNode("v-if", true);
   }
-  const NutTransition = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-6604b1ac"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/transition/transition.vue"]]);
+  const NutTransition = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-6604b1ac"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/transition/transition.vue"]]);
   const overlayProps = {
     ...commonProps,
     /**
@@ -1954,17 +1990,17 @@ if (uni.restoreGlobal) {
     [UPDATE_VISIBLE_EVENT]: (visible) => isBoolean(visible),
     [CLICK_EVENT]: (evt) => evt instanceof Object
   };
-  const componentName$7 = `${PREFIX}-overlay`;
-  const __default__$6 = vue.defineComponent({
-    name: componentName$7,
+  const componentName$9 = `${PREFIX}-overlay`;
+  const __default__$8 = vue.defineComponent({
+    name: componentName$9,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$6,
+  const _sfc_main$k = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$8,
     props: overlayProps,
     emits: overlayEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -1972,7 +2008,7 @@ if (uni.restoreGlobal) {
       const props = __props;
       const emit = __emit;
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$7, {
+        return getMainClass(props, componentName$9, {
           [props.overlayClass]: true
         });
       });
@@ -1993,12 +2029,12 @@ if (uni.restoreGlobal) {
         if (props.closeOnClickOverlay)
           emit(UPDATE_VISIBLE_EVENT, false);
       }
-      const __returned__ = { componentName: componentName$7, props, emit, classes, innerDuration, styles, onClick, NutTransition };
+      const __returned__ = { componentName: componentName$9, props, emit, classes, innerDuration, styles, onClick, NutTransition };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["NutTransition"], {
       "custom-class": $setup.classes,
       "custom-style": $setup.styles,
@@ -2015,7 +2051,7 @@ if (uni.restoreGlobal) {
       /* FORWARDED */
     }, 8, ["custom-class", "custom-style", "show", "duration", "destroy-on-close"]);
   }
-  const NutOverlay = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-53e96d45"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/overlay/overlay.vue"]]);
+  const NutOverlay = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-53e96d45"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/overlay/overlay.vue"]]);
   const popupProps = {
     ...overlayProps,
     ...commonProps,
@@ -2081,7 +2117,7 @@ if (uni.restoreGlobal) {
     [CLOSED_EVENT]: () => true,
     "click-overlay": () => true
   };
-  const componentName$6 = `${PREFIX}-popup`;
+  const componentName$8 = `${PREFIX}-popup`;
   function usePopup(props, emit) {
     const state = vue.reactive({
       innerVisible: false,
@@ -2089,7 +2125,7 @@ if (uni.restoreGlobal) {
       showSlot: true
     });
     const classes = vue.computed(() => {
-      return getMainClass(props, componentName$6, {
+      return getMainClass(props, componentName$8, {
         round: props.round,
         [`nut-popup--${props.position}`]: true,
         [`nut-popup--${props.position}--safebottom`]: props.position === "bottom" && props.safeAreaInsetBottom,
@@ -2163,17 +2199,17 @@ if (uni.restoreGlobal) {
       onClosed
     };
   }
-  const componentName$5 = `${PREFIX}-popup`;
-  const __default__$5 = vue.defineComponent({
-    name: componentName$5,
+  const componentName$7 = `${PREFIX}-popup`;
+  const __default__$7 = vue.defineComponent({
+    name: componentName$7,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$g = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$5,
+  const _sfc_main$j = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$7,
     props: popupProps,
     emits: popupEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -2192,12 +2228,12 @@ if (uni.restoreGlobal) {
         onOpened,
         onClosed
       } = usePopup(props, emit);
-      const __returned__ = { componentName: componentName$5, props, emit, classes, popStyle, innerIndex, showSlot, transitionName, onClick, onClickCloseIcon, onClickOverlay, onOpened, onClosed, NutIcon, NutOverlay, NutTransition };
+      const __returned__ = { componentName: componentName$7, props, emit, classes, popStyle, innerIndex, showSlot, transitionName, onClick, onClickCloseIcon, onClickOverlay, onOpened, onClosed, NutIcon, NutOverlay, NutTransition };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -2253,7 +2289,7 @@ if (uni.restoreGlobal) {
       /* STABLE_FRAGMENT */
     );
   }
-  const NutPopup = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-551f68f5"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/popup/popup.vue"]]);
+  const NutPopup = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-551f68f5"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/popup/popup.vue"]]);
   const actionsheetProps = {
     ...popupProps,
     ...commonProps,
@@ -2318,17 +2354,17 @@ if (uni.restoreGlobal) {
     [CANCEL_EVENT]: () => true,
     [CHOOSE_EVENT]: (item, index) => item instanceof Object && isNumber(index)
   };
-  const componentName$4 = `${PREFIX}-action-sheet`;
-  const __default__$4 = vue.defineComponent({
-    name: componentName$4,
+  const componentName$6 = `${PREFIX}-action-sheet`;
+  const __default__$6 = vue.defineComponent({
+    name: componentName$6,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$f = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$4,
+  const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$6,
     props: actionsheetProps,
     emits: actionsheetEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -2337,7 +2373,7 @@ if (uni.restoreGlobal) {
       const emit = __emit;
       const slotDefault = !!vue.useSlots().default;
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$4);
+        return getMainClass(props, componentName$6);
       });
       function isHighlight(item) {
         return props.chooseTagValue && props.chooseTagValue === item[props.optionTag] ? props.customColor : "";
@@ -2358,12 +2394,12 @@ if (uni.restoreGlobal) {
           emit(UPDATE_VISIBLE_EVENT, false);
         }
       }
-      const __returned__ = { componentName: componentName$4, props, emit, slotDefault, classes, isHighlight, cancelActionSheet, chooseItem, close, NutIcon, NutPopup };
+      const __returned__ = { componentName: componentName$6, props, emit, slotDefault, classes, isHighlight, cancelActionSheet, chooseItem, close, NutIcon, NutPopup };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["NutPopup"], {
       "pop-class": $setup.props.popClass,
       "custom-style": $setup.props.popStyle,
@@ -2471,7 +2507,7 @@ if (uni.restoreGlobal) {
       /* FORWARDED */
     }, 8, ["pop-class", "custom-style", "visible", "overlay", "round", "safe-area-inset-bottom", "z-index", "duration", "overlay-class", "overlay-style", "lock-scroll", "close-on-click-overlay"]);
   }
-  const __unplugin_components_1 = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-56211029"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/actionsheet/actionsheet.vue"]]);
+  const __unplugin_components_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-56211029"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/actionsheet/actionsheet.vue"]]);
   const buttonProps = {
     ...commonProps,
     /**
@@ -2600,17 +2636,17 @@ if (uni.restoreGlobal) {
     login: (evt) => evt instanceof Object,
     im: (evt) => evt instanceof Object
   };
-  const componentName$3 = `${PREFIX}-button`;
-  const __default__$3 = vue.defineComponent({
-    name: componentName$3,
+  const componentName$5 = `${PREFIX}-button`;
+  const __default__$5 = vue.defineComponent({
+    name: componentName$5,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$3,
+  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$5,
     props: buttonProps,
     emits: buttonEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -2618,15 +2654,15 @@ if (uni.restoreGlobal) {
       const props = __props;
       const emit = __emit;
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$3, {
-          [`${componentName$3}--${props.type}`]: !!props.type,
-          [`${componentName$3}--${props.size}`]: !!props.size,
-          [`${componentName$3}--${props.shape}`]: !!props.shape,
-          [`${componentName$3}--plain`]: props.plain,
-          [`${componentName$3}--block`]: props.block,
-          [`${componentName$3}--disabled`]: props.disabled,
-          [`${componentName$3}--loading`]: props.loading,
-          [`${componentName$3}--hovercls`]: props.hoverClass !== "button-hover"
+        return getMainClass(props, componentName$5, {
+          [`${componentName$5}--${props.type}`]: !!props.type,
+          [`${componentName$5}--${props.size}`]: !!props.size,
+          [`${componentName$5}--${props.shape}`]: !!props.shape,
+          [`${componentName$5}--plain`]: props.plain,
+          [`${componentName$5}--block`]: props.block,
+          [`${componentName$5}--disabled`]: props.disabled,
+          [`${componentName$5}--loading`]: props.loading,
+          [`${componentName$5}--hovercls`]: props.hoverClass !== "button-hover"
         });
       });
       const styles = vue.computed(() => {
@@ -2649,12 +2685,12 @@ if (uni.restoreGlobal) {
           return;
         emit(CLICK_EVENT, event);
       }
-      const __returned__ = { componentName: componentName$3, props, emit, classes, styles, handleClick, Icon: NutIcon };
+      const __returned__ = { componentName: componentName$5, props, emit, classes, styles, handleClick, Icon: NutIcon };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass($setup.classes),
       style: vue.normalizeStyle($setup.styles),
@@ -2716,7 +2752,7 @@ if (uni.restoreGlobal) {
       ])
     ], 46, ["form-type", "open-type", "hover-class", "hover-start-time", "hover-stay-time", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "group-id", "guild-id", "public-id", "data-im-id", "data-im-type", "data-goods-id", "data-order-id", "data-biz-line"]);
   }
-  const __unplugin_components_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-7bcd9bda"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/button/button.vue"]]);
+  const __unplugin_components_1 = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-7bcd9bda"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/button/button.vue"]]);
   const ON_SHOW = "onShow";
   const ON_HIDE = "onHide";
   const ON_LAUNCH = "onLaunch";
@@ -2739,7 +2775,7 @@ if (uni.restoreGlobal) {
   const onLaunch = /* @__PURE__ */ createHook(ON_LAUNCH);
   const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
   const onPageHide = onHide;
-  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$g = /* @__PURE__ */ vue.defineComponent({
     __name: "identification-bird",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -2848,9 +2884,9 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_nut_button = __unplugin_components_0$3;
-    const _component_nut_action_sheet = __unplugin_components_1;
+  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_nut_button = __unplugin_components_1;
+    const _component_nut_action_sheet = __unplugin_components_1$1;
     return vue.openBlock(), vue.createElementBlock("view", { class: "content" }, [
       vue.createElementVNode("view", { class: "container" }, [
         vue.createElementVNode("view", { class: "top" }),
@@ -2882,7 +2918,7 @@ if (uni.restoreGlobal) {
       }, null, 8, ["visible"])
     ]);
   }
-  const PagesIdentificationBird = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-48e52518"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/identification-bird.vue"]]);
+  const PagesIdentificationBird = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-48e52518"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/identification-bird.vue"]]);
   const { registerUTSInterface, initUTSProxyClass, initUTSProxyFunction, initUTSPackageName, initUTSIndexClassName, initUTSClassName } = uni;
   const name = "limeAudioPlayer";
   const moduleName = "lime-audio-player 音频播放";
@@ -2893,7 +2929,7 @@ if (uni.restoreGlobal) {
   const cls = /* @__PURE__ */ initUTSIndexClassName(name, is_uni_modules);
   registerUTSInterface("InnerAudioContextOptions", Object.assign({ moduleName, moduleType, errMsg, package: pkg, class: initUTSClassName(name, "InnerAudioContextByJsProxy", is_uni_modules) }, { "methods": { "updateAutoplayByJs": { "async": false, "keepAlive": false, "params": [{ "name": "v", "type": "boolean" }] }, "updateLoopByJs": { "async": false, "keepAlive": false, "params": [{ "name": "isLooping", "type": "boolean" }] }, "updatePlaybackRateByJs": { "async": false, "keepAlive": false, "params": [{ "name": "rate", "type": "number" }] }, "updateSrcByJs": { "async": false, "keepAlive": false, "params": [{ "name": "src", "type": "string" }] }, "updateStartTimeByJs": { "async": false, "keepAlive": false, "params": [{ "name": "value", "type": "number" }] }, "updateVolumeByJs": { "async": false, "keepAlive": false, "params": [{ "name": "volume", "type": "number" }] }, "destroyByJs": { "async": false, "keepAlive": false, "params": [] }, "offCanplayByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offEndedByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offErrorByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offPauseByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offPlayByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offSeekedByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offSeekingByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offStopByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offTimeUpdateByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "offWaitingByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onCanplayByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onEndedByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onErrorByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onPauseByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onPlayByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onSeekedByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onSeekingByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onStopByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onTimeUpdateByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "onWaitingByJs": { "async": false, "keepAlive": false, "params": [{ "name": "listener", "type": "UTSCallback" }] }, "pauseByJs": { "async": false, "keepAlive": false, "params": [] }, "playByJs": { "async": false, "keepAlive": false, "params": [] }, "seekByJs": { "async": false, "keepAlive": false, "params": [{ "name": "position", "type": "number" }] }, "stopByJs": { "async": false, "keepAlive": false, "params": [] }, "setAudioOutputByJs": { "async": false, "keepAlive": false, "params": [{ "name": "outputType", "type": "number" }] } }, "props": ["autoplay", "buffered", "currentTime", "duration", "loop", "obeyMuteSwitch", "paused", "playbackRate", "referrerPolicy", "src", "startTime", "volume"], "setters": { "autoplay": { "name": "autoplay", "type": "boolean" }, "buffered": { "name": "buffered", "type": "number" }, "currentTime": { "name": "currentTime", "type": "number" }, "duration": { "name": "duration", "type": "number" }, "loop": { "name": "loop", "type": "boolean" }, "obeyMuteSwitch": { "name": "obeyMuteSwitch", "type": "boolean" }, "paused": { "name": "paused", "type": "boolean" }, "playbackRate": { "name": "playbackRate", "type": "number" }, "referrerPolicy": { "name": "referrerPolicy", "type": "string" }, "src": { "name": "src", "type": "string" }, "startTime": { "name": "startTime", "type": "number" }, "volume": { "name": "volume", "type": "number" } } }));
   const createInnerAudioContext = /* @__PURE__ */ initUTSProxyFunction(false, { moduleName, moduleType, errMsg, main: true, package: pkg, class: cls, name: "createInnerAudioContextByJs", keepAlive: false, params: [], return: { "type": "interface", "options": "InnerAudioContextOptions" } });
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$f = /* @__PURE__ */ vue.defineComponent({
     __name: "audio-app",
     props: {
       src: {
@@ -3021,7 +3057,7 @@ if (uni.restoreGlobal) {
     }
   });
   const _imports_0 = "/static/logo.png";
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -3125,7 +3161,7 @@ if (uni.restoreGlobal) {
       /* STABLE_FRAGMENT */
     );
   }
-  const AudioApp = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-bcafd490"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/audio-app.vue"]]);
+  const AudioApp = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-bcafd490"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/audio-app.vue"]]);
   var byteToHex = [];
   for (var i = 0; i < 256; ++i) {
     byteToHex.push((i + 256).toString(16).slice(1));
@@ -3322,7 +3358,7 @@ if (uni.restoreGlobal) {
     rnds[8] = rnds[8] & 63 | 128;
     return unsafeStringify(rnds);
   }
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
     __name: "video-app",
     props: {
       src: {
@@ -3377,15 +3413,15 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("iframe", {
       class: vue.normalizeClass(["iframe", $setup.innerVideoClass]),
       srcdoc: $setup.iframeContent,
       style: { "height": "100%", "width": "100%" }
     }, null, 10, ["srcdoc"]);
   }
-  const VideoApp = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-6cdea94a"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/video-app.vue"]]);
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const VideoApp = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-6cdea94a"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/video-app.vue"]]);
+  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "media-loader",
     props: {
       type: {
@@ -3450,7 +3486,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -3489,9 +3525,9 @@ if (uni.restoreGlobal) {
       /* CLASS */
     );
   }
-  const MediaLoader = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-f403e231"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/media-loader.vue"]]);
+  const MediaLoader = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-f403e231"], ["__file", "D:/WebStormProject/bird-identification-app/src/components/media-loader.vue"]]);
   const wsUrl = "ws://localhost:5000";
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "result",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -3536,7 +3572,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_nut_icon = NutIcon;
     return vue.openBlock(), vue.createElementBlock("view", { class: "content" }, [
       $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -3556,12 +3592,12 @@ if (uni.restoreGlobal) {
       ]))
     ]);
   }
-  const PagesResult = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-b7aacf42"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/result.vue"]]);
+  const PagesResult = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-b7aacf42"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/result.vue"]]);
   const block0 = (Comp) => {
     (Comp.$renderjs || (Comp.$renderjs = [])).push("renderScript");
     (Comp.$renderjsModules || (Comp.$renderjsModules = {}))["renderScript"] = "74d14232";
   };
-  const _sfc_main$8 = {
+  const _sfc_main$b = {
     components: {
       MediaLoader,
       TabBar
@@ -3631,10 +3667,10 @@ if (uni.restoreGlobal) {
       });
     }
   };
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_media_loader = MediaLoader;
     const _component_nut_swiper_item = __unplugin_components_0$5;
-    const _component_nut_swiper = __unplugin_components_1$2;
+    const _component_nut_swiper = __unplugin_components_1$3;
     const _component_tab_bar = TabBar;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createVNode(_component_nut_swiper, {
@@ -3697,9 +3733,9 @@ if (uni.restoreGlobal) {
     ]);
   }
   if (typeof block0 === "function")
-    block0(_sfc_main$8);
-  const PagesTodayShare = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-dc54c317"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/today-share.vue"]]);
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+    block0(_sfc_main$b);
+  const PagesTodayShare = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-dc54c317"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/today-share.vue"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "explore-bird-nest",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -3783,9 +3819,9 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_nut_swiper_item = __unplugin_components_0$5;
-    const _component_nut_swiper = __unplugin_components_1$2;
+    const _component_nut_swiper = __unplugin_components_1$3;
     const _component_nut_icon = NutIcon;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createVNode(_component_nut_swiper, {
@@ -3903,7 +3939,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesExploreBirdNest = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-831a9a38"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/explore-bird-nest.vue"]]);
+  const PagesExploreBirdNest = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-831a9a38"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/explore-bird-nest.vue"]]);
   function defineLocaleConfig(locale) {
     return locale;
   }
@@ -4168,18 +4204,18 @@ if (uni.restoreGlobal) {
      */
     description: makeStringProp("")
   };
-  const componentName$2 = `${PREFIX}-empty`;
-  const { translate: translate$1 } = useTranslate(componentName$2);
-  const __default__$2 = vue.defineComponent({
-    name: componentName$2,
+  const componentName$4 = `${PREFIX}-empty`;
+  const { translate: translate$1 } = useTranslate(componentName$4);
+  const __default__$4 = vue.defineComponent({
+    name: componentName$4,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$2,
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$4,
     props: emptyProps,
     setup(__props, { expose: __expose }) {
       __expose();
@@ -4190,7 +4226,7 @@ if (uni.restoreGlobal) {
         network: "https://static-ftcms.jd.com/p/files/61a9e31de7dcdbcc0ce62734.png"
       };
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$2);
+        return getMainClass(props, componentName$4);
       });
       const style = vue.computed(() => {
         if (props.imageSize) {
@@ -4203,12 +4239,12 @@ if (uni.restoreGlobal) {
       });
       const isHttpUrl = props.image.startsWith("https://") || props.image.startsWith("http://") || props.image.startsWith("//");
       const src = isHttpUrl ? props.image : defaultStatus[props.image];
-      const __returned__ = { componentName: componentName$2, translate: translate$1, props, defaultStatus, classes, style, isHttpUrl, src };
+      const __returned__ = { componentName: componentName$4, translate: translate$1, props, defaultStatus, classes, style, isHttpUrl, src };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -4249,7 +4285,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-afb53fd7"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/empty/empty.vue"]]);
+  const __unplugin_components_0$3 = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-afb53fd7"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/empty/empty.vue"]]);
   const FORM_KEY = Symbol("Form");
   function useFormDisabled(disabled) {
     const { parent } = useInject(FORM_KEY);
@@ -4343,18 +4379,18 @@ if (uni.restoreGlobal) {
     clickLeftIcon: (val, event) => (isString(val) || val === void 0) && event instanceof Object,
     clickRightIcon: (val, event) => (isString(val) || val === void 0) && event instanceof Object
   };
-  const componentName$1 = `${PREFIX}-searchbar`;
-  const { translate } = useTranslate(componentName$1);
-  const __default__$1 = vue.defineComponent({
-    name: componentName$1,
+  const componentName$3 = `${PREFIX}-searchbar`;
+  const { translate } = useTranslate(componentName$3);
+  const __default__$3 = vue.defineComponent({
+    name: componentName$3,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
-    ...__default__$1,
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$3,
     props: searchbarProps,
     emits: searchbarEmits,
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -4383,7 +4419,7 @@ if (uni.restoreGlobal) {
         return Number(props.maxLength);
       });
       const classes = vue.computed(() => {
-        return getMainClass(props, componentName$1, {
+        return getMainClass(props, componentName$3, {
           "safe-area-inset-bottom": props.safeAreaInsetBottom
         });
       });
@@ -4444,12 +4480,12 @@ if (uni.restoreGlobal) {
       function handleRightIconClick(event) {
         emit("clickRightIcon", innerValue.value, event);
       }
-      const __returned__ = { componentName: componentName$1, translate, props, emit, slots, hasSlot, formDisabled, state, stringModelValue, innerValue, innerMaxLength, classes, styles, inputWrapperStyles, inputStyles, handleValue, handleInput, handleFocus, handleBlur, handleClear, handleSubmit, handleInputClick, handleLeftIconClick, handleRightIconClick, NutIcon };
+      const __returned__ = { componentName: componentName$3, translate, props, emit, slots, hasSlot, formDisabled, state, stringModelValue, innerValue, innerMaxLength, classes, styles, inputWrapperStyles, inputStyles, handleValue, handleInput, handleFocus, handleBlur, handleClear, handleSubmit, handleInputClick, handleLeftIconClick, handleRightIconClick, NutIcon };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -4566,8 +4602,8 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-2f2d6563"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/searchbar/searchbar.vue"]]);
-  const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
+  const __unplugin_components_0$2 = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-2f2d6563"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/searchbar/searchbar.vue"]]);
+  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "bird-search",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -4602,9 +4638,9 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_nut_searchbar = __unplugin_components_0$1;
-    const _component_nut_empty = __unplugin_components_0$2;
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_nut_searchbar = __unplugin_components_0$2;
+    const _component_nut_empty = __unplugin_components_0$3;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "top" }, [
         vue.createVNode(_component_nut_searchbar, {
@@ -4648,7 +4684,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesBirdSearch = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-576df4ed"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/bird-search.vue"]]);
+  const PagesBirdSearch = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-576df4ed"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/bird-search.vue"]]);
   const AVATAR_GROUP_KEY = Symbol("avatarGroup");
   const avatarProps = {
     ...commonProps,
@@ -4670,17 +4706,17 @@ if (uni.restoreGlobal) {
     customColor: makeStringProp("#666")
   };
   const avatarSize = ["large", "normal", "small"];
-  const componentName = `${PREFIX}-avatar`;
-  const __default__ = vue.defineComponent({
-    name: componentName,
+  const componentName$2 = `${PREFIX}-avatar`;
+  const __default__$2 = vue.defineComponent({
+    name: componentName$2,
     options: {
       virtualHost: true,
       addGlobalClass: true,
       styleIsolation: "shared"
     }
   });
-  const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
-    ...__default__,
+  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$2,
     props: avatarProps,
     setup(__props, { expose: __expose }) {
       __expose();
@@ -4745,7 +4781,7 @@ if (uni.restoreGlobal) {
         };
         if (finalSize.value.preset)
           value[`nut-avatar-${finalSize.value.value}`] = true;
-        return getMainClass(props, componentName, value);
+        return getMainClass(props, componentName$2, value);
       });
       const styles = vue.computed(() => {
         const value = {
@@ -4762,12 +4798,12 @@ if (uni.restoreGlobal) {
           value.zIndex = innerZIndex.value;
         return getMainStyle(props, value);
       });
-      const __returned__ = { componentName, props, instance, parent, show, innerZIndex, getTrulySize, finalSize, finalShape, classes, styles };
+      const __returned__ = { componentName: componentName$2, props, instance, parent, show, innerZIndex, getTrulySize, finalSize, finalShape, classes, styles };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -4781,8 +4817,8 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __unplugin_components_0 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-49958696"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/avatar/avatar.vue"]]);
-  const _sfc_main$2 = /* @__PURE__ */ vue.defineComponent({
+  const __unplugin_components_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-49958696"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/avatar/avatar.vue"]]);
+  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "myself",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -4849,10 +4885,10 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     var _a, _b, _c, _d, _e;
-    const _component_nut_avatar = __unplugin_components_0;
-    const _component_nut_action_sheet = __unplugin_components_1;
+    const _component_nut_avatar = __unplugin_components_0$1;
+    const _component_nut_action_sheet = __unplugin_components_1$1;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "top" }, [
         vue.createElementVNode("view", { class: "head" }, [
@@ -4940,8 +4976,8 @@ if (uni.restoreGlobal) {
       }, null, 8, ["visible"])
     ]);
   }
-  const PagesMyself = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-6ce9bf4d"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/myself.vue"]]);
-  const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
+  const PagesMyself = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-6ce9bf4d"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/myself.vue"]]);
+  const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     __name: "my-bird",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -4976,8 +5012,8 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_nut_empty = __unplugin_components_0$2;
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_nut_empty = __unplugin_components_0$3;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "top" }, " 识别记录 "),
       vue.createElementVNode("view", { class: "list" }, [
@@ -5010,7 +5046,894 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesMyBird = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-03a80356"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/my-bird.vue"]]);
+  const PagesMyBird = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-03a80356"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/my-bird.vue"]]);
+  const toastDefaultOptionsKey = "__TOAST_OPTIONS__";
+  const toastDefaultOptions = {
+    visible: false,
+    type: "text",
+    msg: "",
+    duration: 2e3,
+    size: "base",
+    zIndex: 50,
+    iconSize: "20px",
+    center: true,
+    bottom: "30px",
+    textAlignCenter: true,
+    loadingRotate: true
+  };
+  const toastProps = {
+    ...commonProps,
+    /**
+     * @description 是否显示
+     */
+    visible: {
+      type: Boolean,
+      default: toastDefaultOptions.visible
+    },
+    /**
+     * @description 配置注入的key
+     */
+    selector: String,
+    /**
+     * @description 弹框类型，可选值（text、success、error、warning、loading）
+     */
+    type: makeStringProp(toastDefaultOptions.type),
+    /**
+     * @description 标题
+     */
+    title: String,
+    /**
+     * @description 消息文本内容，支持传入HTML
+     */
+    msg: makeStringProp(toastDefaultOptions.msg),
+    /**
+     * @description 展示时长（单位：ms）
+     * - 值为0时toast不会自动关闭
+     * - 组合式函数用法/Ref用法中，loading类型默认为0
+     */
+    duration: makeNumberProp(toastDefaultOptions.duration),
+    /**
+     * @description 文案尺寸，可选值（small、base、large）
+     */
+    size: makeStringProp(toastDefaultOptions.size),
+    /**
+     * @description 组件z-index
+     */
+    zIndex: makeNumberProp(toastDefaultOptions.zIndex),
+    /**
+     * @description 自定义图标
+     */
+    icon: String,
+    /**
+     * @description 图标大小
+     */
+    iconSize: makeNumericProp(toastDefaultOptions.iconSize),
+    /**
+     * @description 背景颜色
+     */
+    bgColor: String,
+    /**
+     * @description 是否显示遮罩层
+     * - 组合式函数用法/Ref用法中，loading类型默认为true
+     */
+    cover: Boolean,
+    /**
+     * @description 遮罩层颜色，默认透明
+     */
+    coverColor: String,
+    /**
+     * @description 是否展示在页面中部（为false时展示在底部）
+     */
+    center: {
+      type: Boolean,
+      default: toastDefaultOptions.center
+    },
+    /**
+     * @description 距页面底部的距离（center为false时生效）
+     */
+    bottom: makeNumericProp(toastDefaultOptions.bottom),
+    /**
+     * @description 文案是否居中
+     */
+    textAlignCenter: {
+      type: Boolean,
+      default: toastDefaultOptions.textAlignCenter
+    },
+    /**
+     * @description loading图标是否旋转（仅对loading类型生效）
+     */
+    loadingRotate: {
+      type: Boolean,
+      default: toastDefaultOptions.loadingRotate
+    },
+    /**
+     * @description 是否在点击遮罩层后关闭提示
+     */
+    closeOnClickOverlay: Boolean,
+    /**
+     * @description 关闭时触发的事件
+     */
+    onClose: Function,
+    /**
+     * @description 关闭动画完成时触发的事件
+     */
+    onClosed: Function
+  };
+  const toastEmits = {
+    [UPDATE_VISIBLE_EVENT]: (visible) => isBoolean(visible),
+    [CLOSE_EVENT]: () => true,
+    [CLOSED_EVENT]: () => true
+  };
+  const componentName$1 = `${PREFIX}-toast`;
+  const __default__$1 = vue.defineComponent({
+    name: componentName$1,
+    options: {
+      virtualHost: true,
+      addGlobalClass: true,
+      styleIsolation: "shared"
+    }
+  });
+  const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
+    ...__default__$1,
+    props: toastProps,
+    emits: toastEmits,
+    setup(__props, { expose: __expose, emit: __emit }) {
+      const props = __props;
+      const emit = __emit;
+      const slots = vue.useSlots();
+      const toastOptionsKey = `${toastDefaultOptionsKey}${props.selector || ""}`;
+      const injectToastOptions = vue.inject(toastOptionsKey, vue.ref(cloneDeep(toastDefaultOptions)));
+      const typeIcons = {
+        text: "",
+        success: "success",
+        error: "failure",
+        warning: "tips",
+        loading: "loading"
+      };
+      const innerVisible = vue.ref(false);
+      const toastOptions = vue.ref(cloneDeep(props));
+      const iconName = vue.computed(() => {
+        const { icon, type } = toastOptions.value;
+        return icon || typeIcons[type];
+      });
+      const hasIcon = vue.computed(() => {
+        return Boolean(iconName.value);
+      });
+      const classes = vue.computed(() => {
+        const { size, cover, center, type, loadingRotate } = toastOptions.value;
+        return getMainClass(props, componentName$1, {
+          [`nut-toast-${size}`]: true,
+          "nut-toast-cover": cover,
+          "nut-toast-center": center,
+          "nut-toast-loading": type === "loading",
+          "nut-toast-loading-rotate": loadingRotate,
+          "nut-toast-has-icon": hasIcon.value
+        });
+      });
+      const styles = vue.computed(() => {
+        return getMainStyle(props, {
+          zIndex: toastOptions.value.zIndex
+        });
+      });
+      const wrapperStyles = vue.computed(() => {
+        const value = {};
+        const { cover, coverColor, center, bottom } = toastOptions.value;
+        if (cover) {
+          value.backgroundColor = coverColor;
+        } else {
+          if (!center)
+            value.bottom = pxCheck(bottom);
+        }
+        return value;
+      });
+      const innerStyles = vue.computed(() => {
+        const { textAlignCenter, bgColor, cover, center, bottom } = toastOptions.value;
+        const value = {
+          textAlign: textAlignCenter ? "center" : "left",
+          backgroundColor: bgColor
+        };
+        if (cover) {
+          if (!center)
+            value.bottom = pxCheck(bottom);
+        }
+        return value;
+      });
+      let timer = null;
+      function startTimer() {
+        timer = setTimeout(() => {
+          hide();
+        }, toastOptions.value.duration);
+      }
+      function destroyTimer() {
+        if (timer == null)
+          return;
+        clearTimeout(timer);
+        timer = null;
+      }
+      function show(type, msg, options) {
+        destroyTimer();
+        toastOptions.value = Object.assign(cloneDeep(toastDefaultOptions), {
+          visible: true,
+          type,
+          msg
+        }, options);
+        innerVisible.value = true;
+        if (toastOptions.value.duration > 0)
+          startTimer();
+      }
+      function showText(msg, options) {
+        show("text", msg, options);
+      }
+      function showSuccess(msg, options) {
+        show("success", msg, options);
+      }
+      function showError(msg, options) {
+        show("error", msg, options);
+      }
+      function showWarning(msg, options) {
+        show("warning", msg, options);
+      }
+      function showLoading(msg, options) {
+        show("loading", msg, Object.assign({
+          duration: 0,
+          cover: true
+        }, options));
+      }
+      function hide() {
+        destroyTimer();
+        innerVisible.value = false;
+        toastOptions.value.visible = false;
+        emit(UPDATE_VISIBLE_EVENT, false);
+        emit(CLOSE_EVENT);
+        if (toastOptions.value.onClose) {
+          toastOptions.value.onClose();
+        }
+      }
+      function handleAfterLeave() {
+        emit(CLOSED_EVENT);
+        if (toastOptions.value.onClosed) {
+          toastOptions.value.onClosed();
+        }
+      }
+      function handleCoverClick() {
+        if (!toastOptions.value.closeOnClickOverlay)
+          return;
+        hide();
+      }
+      vue.watch(() => props, (value) => {
+        toastOptions.value = Object.assign(cloneDeep(toastDefaultOptions), value);
+        if (value.visible)
+          show(toastOptions.value.type, toastOptions.value.msg, toastOptions.value);
+        else
+          hide();
+      }, { deep: true });
+      vue.watch(injectToastOptions, (value) => {
+        toastOptions.value = Object.assign(cloneDeep(toastDefaultOptions), value);
+        if (value.visible)
+          show(toastOptions.value.type, toastOptions.value.msg, toastOptions.value);
+        else
+          hide();
+      });
+      vue.onBeforeUnmount(() => {
+        destroyTimer();
+      });
+      __expose({
+        showToast: {
+          text: showText,
+          success: showSuccess,
+          fail: showError,
+          warn: showWarning,
+          loading: showLoading
+        },
+        hideToast: hide,
+        text: showText,
+        success: showSuccess,
+        error: showError,
+        warning: showWarning,
+        loading: showLoading,
+        hide
+      });
+      const __returned__ = { componentName: componentName$1, props, emit, slots, toastOptionsKey, injectToastOptions, typeIcons, innerVisible, toastOptions, iconName, hasIcon, classes, styles, wrapperStyles, innerStyles, get timer() {
+        return timer;
+      }, set timer(v) {
+        timer = v;
+      }, startTimer, destroyTimer, show, showText, showSuccess, showError, showWarning, showLoading, hide, handleAfterLeave, handleCoverClick, NutIcon, NutTransition };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createBlock($setup["NutTransition"], {
+      "custom-class": $setup.classes,
+      "custom-style": $setup.styles,
+      show: $setup.innerVisible,
+      name: "fade",
+      onAfterLeave: $setup.handleAfterLeave
+    }, {
+      default: vue.withCtx(() => [
+        vue.createElementVNode(
+          "view",
+          {
+            class: "nut-toast-wrapper",
+            style: vue.normalizeStyle($setup.wrapperStyles),
+            onClick: $setup.handleCoverClick
+          },
+          [
+            $setup.slots.default ? vue.renderSlot(_ctx.$slots, "default", { key: 0 }, void 0, true) : (vue.openBlock(), vue.createElementBlock(
+              "view",
+              {
+                key: 1,
+                class: "nut-toast-inner",
+                style: vue.normalizeStyle($setup.innerStyles)
+              },
+              [
+                $setup.hasIcon ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 0,
+                  class: "nut-toast-icon-wrapper"
+                }, [
+                  vue.createVNode($setup["NutIcon"], {
+                    name: $setup.iconName,
+                    size: $setup.toastOptions.iconSize,
+                    "custom-color": "#ffffff"
+                  }, null, 8, ["name", "size"])
+                ])) : vue.createCommentVNode("v-if", true),
+                $setup.toastOptions.title ? (vue.openBlock(), vue.createElementBlock(
+                  "text",
+                  {
+                    key: 1,
+                    class: "nut-toast-title"
+                  },
+                  vue.toDisplayString($setup.toastOptions.title),
+                  1
+                  /* TEXT */
+                )) : vue.createCommentVNode("v-if", true),
+                $setup.toastOptions.msg ? (vue.openBlock(), vue.createElementBlock("rich-text", {
+                  key: 2,
+                  class: "nut-toast-text",
+                  nodes: $setup.toastOptions.msg
+                }, null, 8, ["nodes"])) : vue.createCommentVNode("v-if", true)
+              ],
+              4
+              /* STYLE */
+            ))
+          ],
+          4
+          /* STYLE */
+        )
+      ]),
+      _: 3
+      /* FORWARDED */
+    }, 8, ["custom-class", "custom-style", "show"]);
+  }
+  const __unplugin_components_2 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-2745e473"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/toast/toast.vue"]]);
+  const inputProps = {
+    ...commonProps,
+    /**
+     * @description 输入框类型，支持原生 `input` 标签的所有 `type` 属性，另外还支持 `number` `digit`
+     */
+    type: makeStringProp("text"),
+    /**
+     * @description 输入值，双向绑定
+     */
+    modelValue: makeNumericProp(""),
+    /**
+     * @description 输入框自定义类名
+     */
+    inputClass: {
+      type: [String, Object, Array],
+      default: ""
+    },
+    /**
+     * @description 输入框自定义样式
+     */
+    inputStyle: {
+      type: [String, Object, Array],
+      default: ""
+    },
+    /**
+     * @description 输入框为空时占位符
+     */
+    placeholder: makeStringProp(""),
+    /**
+     * @description 指定 placeholder 的样式
+     */
+    placeholderStyle: makeStringProp(""),
+    /**
+     * @description 指定 placeholder 的样式类
+     */
+    placeholderClass: makeStringProp("input-placeholder"),
+    /**
+     * @description 输入框内容对齐方式，可选值 `left`、`center`、`right`
+     */
+    inputAlign: makeStringProp("left"),
+    /**
+     * @description 是否显示必填字段的标签旁边的红色星号
+     */
+    required: Boolean,
+    /**
+     * @description 是否禁用
+     */
+    disabled: nullableBooleanProp,
+    /**
+     * @description 是否只读
+     */
+    readonly: Boolean,
+    /**
+     * @description 是否标红
+     */
+    error: Boolean,
+    /**
+     * @description 限制最长输入字符
+     */
+    maxLength: makeNumericProp(140),
+    /**
+     * @description 展示清除 `Icon`
+     */
+    clearable: Boolean,
+    /**
+     * @description 清除图标的 `font-size` 大小
+     */
+    clearSize: makeNumericProp("14"),
+    /**
+     * @description 是否显示下边框
+     */
+    border: truthProp,
+    /**
+     * @description 格式化函数触发的时机，可选值为 `onChange`、`onBlur`
+     */
+    formatTrigger: makeStringProp("onChange"),
+    /**
+     * @description 输入内容格式化函数
+     */
+    formatter: {
+      type: Function,
+      default: null
+    },
+    /**
+     * @description 是否显示限制最长输入字符，需要设置 `max-length` 属性
+     */
+    showWordLimit: Boolean,
+    /**
+     * @description 是否自动获得焦点，`iOS` 系统不支持该属性
+     */
+    autofocus: Boolean,
+    /**
+     * @description 键盘右下角按钮的文字，仅在`type='text'`时生效,可选值 `send`：发送、`search`：搜索、`next`：下一个、`go`：前往、`done`：完成
+     */
+    confirmType: makeStringProp("done"),
+    /**
+     * @description  键盘弹起时，是否自动上推页面
+     */
+    adjustPosition: truthProp,
+    /**
+     * @description 是否强制使用系统键盘和 `Web-view` 创建的 `input` 元素。为 `true` 时，`confirm-type`、`confirm-hold` 可能失效
+     */
+    alwaysSystem: Boolean,
+    /**
+     * @description 是否在失去焦点后，继续展示清除按钮，在设置 `clearable` 时生效
+     */
+    showClearIcon: Boolean,
+    /**
+     * @description 输入框模式
+     */
+    inputMode: makeStringProp("text"),
+    /**
+     * @description 指定光标与键盘的距离，取 input 距离底部的距离和 cursor-spacing 指定的距离的最小值作为光标与键盘的距离
+     */
+    cursorSpacing: makeNumberProp(0),
+    /**
+     * @description 强制 input 处于同层状态，默认 focus 时 input 会切到非同层状态 (仅在 iOS 下生效)
+     */
+    alwaysEmbed: Boolean,
+    /**
+     * @description 点击键盘右下角按钮时是否保持键盘不收起
+     */
+    confirmHold: Boolean,
+    /**
+     * @description 指定focus时的光标位置
+     */
+    cursor: Number,
+    /**
+     * @description 光标起始位置，自动聚集时有效，需与selection-end搭配使用
+     */
+    selectionStart: makeNumberProp(-1),
+    /**
+     * @description 光标结束位置，自动聚集时有效，需与selection-start搭配使用
+     */
+    selectionEnd: makeNumberProp(-1),
+    /**
+     * @description focus时，点击页面的时候不收起键盘
+     */
+    holdKeyboard: Boolean
+  };
+  const inputEmits = {
+    [CLICK_EVENT]: (evt) => evt instanceof Object,
+    clickInput: (evt) => evt instanceof Object,
+    [BLUR_EVENT]: (evt) => evt instanceof Object,
+    [FOCUS_EVENT]: (evt) => evt instanceof Object,
+    [CLEAR_EVENT]: () => true,
+    [CONFIRM_EVENT]: (evt) => evt instanceof Object,
+    [UPDATE_MODEL_EVENT]: (val1, val2) => (isString(val1) || isNumber(val1)) && (val2 instanceof Object || val2 === void 0),
+    [INPUT_EVENT]: (val, evt) => (isString(val) || isNumber(val)) && evt instanceof Object
+  };
+  function trimExtraChar(value, char, regExp) {
+    const index = value.indexOf(char);
+    if (index === -1)
+      return value;
+    if (char === "-" && index !== 0)
+      return value.slice(0, index);
+    return value.slice(0, index + 1) + value.slice(index).replace(regExp, "");
+  }
+  function formatNumber(value, allowDot = true, allowMinus = true) {
+    if (allowDot)
+      value = trimExtraChar(value, ".", /\./g);
+    else
+      value = value.split(".")[0];
+    if (allowMinus)
+      value = trimExtraChar(value, "-", /-/g);
+    else
+      value = value.replace(/-/, "");
+    const regExp = allowDot ? /[^-0-9.]/g : /[^-0-9]/g;
+    return value.replace(regExp, "");
+  }
+  const componentName = `${PREFIX}-input`;
+  const __default__ = vue.defineComponent({
+    name: componentName,
+    options: {
+      virtualHost: true,
+      addGlobalClass: true,
+      styleIsolation: "shared"
+    }
+  });
+  const _sfc_main$2 = /* @__PURE__ */ vue.defineComponent({
+    ...__default__,
+    props: inputProps,
+    emits: inputEmits,
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const slots = vue.useSlots();
+      function hasSlot(name2) {
+        return Boolean(slots[name2]);
+      }
+      const formDisabled = useFormDisabled(vue.toRef(props, "disabled"));
+      function stringModelValue() {
+        if (props.modelValue == null)
+          return "";
+        return String(props.modelValue);
+      }
+      const innerValue = vue.computed(() => {
+        return stringModelValue();
+      });
+      const classes = vue.computed(() => {
+        return getMainClass(props, componentName, {
+          [`${componentName}--disabled`]: formDisabled.value,
+          [`${componentName}--required`]: props.required,
+          [`${componentName}--error`]: props.error,
+          [`${componentName}--border`]: props.border
+        });
+      });
+      const inputStyles = vue.computed(() => {
+        return [props.inputStyle, {
+          textAlign: props.inputAlign
+        }];
+      });
+      const innerMaxLength = vue.computed(() => {
+        if (props.maxLength == null)
+          return -1;
+        return Number(props.maxLength);
+      });
+      function updateValue(value, trigger = "onChange") {
+        if (innerMaxLength.value > 0 && value.length > innerMaxLength.value)
+          value = value.slice(0, innerMaxLength.value);
+        if (props.type === "number")
+          value = formatNumber(value, false, false);
+        if (props.type === "digit")
+          value = formatNumber(value, true, true);
+        if (props.formatter && trigger === props.formatTrigger)
+          value = props.formatter(value);
+        emit(UPDATE_MODEL_EVENT, value);
+      }
+      function _onInput(evt) {
+        updateValue(evt.detail.value);
+        vue.nextTick(() => {
+          emit(INPUT_EVENT, innerValue.value, evt);
+        });
+      }
+      function handleInput(evt) {
+        if (isH5) {
+          const target = evt.target;
+          if (!target.composing)
+            _onInput(evt);
+        } else {
+          _onInput(evt);
+        }
+      }
+      function handleClick(evt) {
+        emit(CLICK_EVENT, evt);
+      }
+      function handleClickInput(evt) {
+        if (formDisabled.value)
+          return;
+        emit("clickInput", evt);
+      }
+      const active = vue.ref(false);
+      const clearing = vue.ref(false);
+      function handleFocus(evt) {
+        if (formDisabled.value || props.readonly)
+          return;
+        emit(FOCUS_EVENT, evt);
+        active.value = true;
+      }
+      function handleBlur(evt) {
+        if (formDisabled.value || props.readonly)
+          return;
+        emit(BLUR_EVENT, evt);
+        setTimeout(() => {
+          active.value = false;
+        }, 200);
+        if (clearing.value) {
+          clearing.value = false;
+          return;
+        }
+        updateValue(evt.detail.value, "onBlur");
+      }
+      function handleConfirm(evt) {
+        emit(CONFIRM_EVENT, evt);
+      }
+      function handleClear(evt) {
+        if (formDisabled.value)
+          return;
+        emit(UPDATE_MODEL_EVENT, "", evt);
+        emit(CLEAR_EVENT);
+        clearing.value = true;
+      }
+      function startComposing(evt) {
+        if (isH5) {
+          const target = evt.target;
+          target.composing = true;
+        }
+      }
+      function endComposing(evt) {
+        if (isH5) {
+          const target = evt.target;
+          if (target.composing) {
+            target.composing = false;
+            target.dispatchEvent(new Event("input"));
+          }
+        }
+      }
+      vue.watch(
+        () => props.modelValue,
+        (value) => {
+          if (value === innerValue.value)
+            return;
+          updateValue(stringModelValue());
+        }
+      );
+      vue.onMounted(() => {
+        updateValue(stringModelValue(), props.formatTrigger);
+      });
+      const __returned__ = { componentName, props, emit, slots, hasSlot, formDisabled, stringModelValue, innerValue, classes, inputStyles, innerMaxLength, updateValue, _onInput, handleInput, handleClick, handleClickInput, active, clearing, handleFocus, handleBlur, handleConfirm, handleClear, startComposing, endComposing, NutIcon };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: vue.normalizeClass($setup.classes),
+        style: vue.normalizeStyle($setup.props.customStyle),
+        onClick: $setup.handleClick
+      },
+      [
+        $setup.hasSlot("left") ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 0,
+          class: "nut-input__left"
+        }, [
+          vue.renderSlot(_ctx.$slots, "left", {}, void 0, true)
+        ])) : vue.createCommentVNode("v-if", true),
+        vue.createElementVNode("view", { class: "nut-input__value" }, [
+          vue.createElementVNode("input", {
+            class: vue.normalizeClass(["nut-input__input", $setup.props.inputClass]),
+            style: vue.normalizeStyle($setup.inputStyles),
+            value: $setup.innerValue,
+            type: $setup.props.type,
+            placeholder: $setup.props.placeholder,
+            "placeholder-style": $setup.props.placeholderStyle,
+            "placeholder-class": $setup.props.placeholderClass,
+            disabled: $setup.formDisabled,
+            readonly: $setup.props.readonly,
+            focus: $setup.props.autofocus,
+            maxlength: $setup.innerMaxLength,
+            "format-trigger": $setup.props.formatTrigger,
+            "auto-blur": $setup.props.autofocus ? true : void 0,
+            "confirm-type": $setup.props.confirmType,
+            "adjust-position": $setup.props.adjustPosition,
+            "always-system": $setup.props.alwaysSystem,
+            inputmode: $setup.props.inputMode,
+            "cursor-spacing": $setup.props.cursorSpacing,
+            "always-embed": $setup.props.alwaysEmbed,
+            "confirm-hold": $setup.props.confirmHold,
+            cursor: $setup.props.cursor,
+            "selection-start": $setup.props.selectionStart,
+            "selection-end": $setup.props.selectionEnd,
+            "hold-keyboard": $setup.props.holdKeyboard,
+            onInput: $setup.handleInput,
+            onFocus: $setup.handleFocus,
+            onBlur: $setup.handleBlur,
+            onClick: $setup.handleClickInput,
+            onChange: $setup.endComposing,
+            onCompositionstart: $setup.startComposing,
+            onCompositionend: $setup.endComposing,
+            onConfirm: $setup.handleConfirm
+          }, null, 46, ["value", "type", "placeholder", "placeholder-style", "placeholder-class", "disabled", "readonly", "focus", "maxlength", "format-trigger", "auto-blur", "confirm-type", "adjust-position", "always-system", "inputmode", "cursor-spacing", "always-embed", "confirm-hold", "cursor", "selection-start", "selection-end", "hold-keyboard"]),
+          $setup.props.readonly ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "nut-input__mask",
+            onClick: $setup.handleClickInput
+          })) : vue.createCommentVNode("v-if", true),
+          $setup.props.showWordLimit && $setup.innerMaxLength > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "nut-input__word-limit"
+          }, [
+            vue.createElementVNode(
+              "text",
+              { class: "nut-input__word-num" },
+              vue.toDisplayString($setup.innerValue.length),
+              1
+              /* TEXT */
+            ),
+            vue.createTextVNode(
+              "/" + vue.toDisplayString($setup.innerMaxLength),
+              1
+              /* TEXT */
+            )
+          ])) : vue.createCommentVNode("v-if", true)
+        ]),
+        $setup.props.clearable && !$setup.props.readonly ? (vue.openBlock(), vue.createElementBlock(
+          "view",
+          {
+            key: 1,
+            class: vue.normalizeClass(["nut-input__clear", { "nut-hidden": !(($setup.active || $setup.props.showClearIcon) && $setup.innerValue.length > 0) }]),
+            onClick: vue.withModifiers($setup.handleClear, ["stop"])
+          },
+          [
+            $setup.hasSlot("clear") ? vue.renderSlot(_ctx.$slots, "clear", { key: 0 }, void 0, true) : (vue.openBlock(), vue.createBlock($setup["NutIcon"], {
+              key: 1,
+              name: "mask-close",
+              "custom-class": "nut-input__clear-icon",
+              size: $setup.props.clearSize,
+              width: $setup.props.clearSize,
+              height: $setup.props.clearSize
+            }, null, 8, ["size", "width", "height"]))
+          ],
+          2
+          /* CLASS */
+        )) : vue.createCommentVNode("v-if", true),
+        $setup.hasSlot("right") ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 2,
+          class: "nut-input__right"
+        }, [
+          vue.renderSlot(_ctx.$slots, "right", {}, void 0, true)
+        ])) : vue.createCommentVNode("v-if", true)
+      ],
+      6
+      /* CLASS, STYLE */
+    );
+  }
+  const __unplugin_components_0 = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-4ee5a9bd"], ["__file", "D:/WebStormProject/bird-identification-app/node_modules/nutui-uniapp/components/input/input.vue"]]);
+  function useToast(selector = "") {
+    const toastOptionsKey = `${toastDefaultOptionsKey}${selector || ""}`;
+    const toastOptions = vue.ref(cloneDeep(toastDefaultOptions));
+    vue.provide(toastOptionsKey, toastOptions);
+    function show(type, msg, options) {
+      toastOptions.value = Object.assign({
+        visible: true,
+        type,
+        msg
+      }, options);
+    }
+    function showText(msg, options) {
+      show("text", msg, options);
+    }
+    function showSuccess(msg, options) {
+      show("success", msg, options);
+    }
+    function showError(msg, options) {
+      show("error", msg, options);
+    }
+    function showWarning(msg, options) {
+      show("warning", msg, options);
+    }
+    function showLoading(msg, options) {
+      show("loading", msg, Object.assign({
+        duration: 0,
+        cover: true
+      }, options));
+    }
+    function hide() {
+      toastOptions.value = Object.assign(cloneDeep(toastOptions.value), {
+        visible: false
+      });
+    }
+    return {
+      showToast: {
+        text: showText,
+        success: showSuccess,
+        fail: showError,
+        warn: showWarning,
+        loading: showLoading
+      },
+      hideToast: hide,
+      text: showText,
+      success: showSuccess,
+      error: showError,
+      warning: showWarning,
+      loading: showLoading,
+      hide
+    };
+  }
+  const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
+    __name: "register",
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const toast = useToast();
+      const account = vue.ref();
+      const password = vue.ref();
+      const submit = () => {
+        if (account.value && password.value) {
+          uni.navigateTo({
+            url: `/pages/index`
+          });
+          uni.setStorageSync("userToken", "yourTokenHere");
+        } else {
+          toast.warning("请输入用户名和密码！");
+        }
+      };
+      const __returned__ = { toast, account, password, submit };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_nut_input = __unplugin_components_0;
+    const _component_nut_button = __unplugin_components_1;
+    const _component_nut_toast = __unplugin_components_2;
+    return vue.openBlock(), vue.createElementBlock("view", { class: "content" }, [
+      vue.createElementVNode("img", { src: "https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg" }),
+      vue.createElementVNode("view", { class: "form" }, [
+        vue.createElementVNode("view", { class: "form-item" }, [
+          vue.createElementVNode("view", { class: "title" }, "账号"),
+          vue.createVNode(_component_nut_input, {
+            modelValue: $setup.account,
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.account = $event),
+            placeholder: "请输入账号"
+          }, null, 8, ["modelValue"])
+        ]),
+        vue.createElementVNode("view", { class: "form-item" }, [
+          vue.createElementVNode("view", { class: "title" }, "密码"),
+          vue.createVNode(_component_nut_input, {
+            modelValue: $setup.password,
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.password = $event),
+            type: "password",
+            placeholder: "请输入密码"
+          }, null, 8, ["modelValue"])
+        ]),
+        vue.createVNode(_component_nut_button, { onClick: $setup.submit }, {
+          default: vue.withCtx(() => [
+            vue.createTextVNode("创建账号")
+          ]),
+          _: 1
+          /* STABLE */
+        }),
+        vue.createVNode(_component_nut_toast)
+      ])
+    ]);
+  }
+  const PagesRegister = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-af4f5d19"], ["__file", "D:/WebStormProject/bird-identification-app/src/pages/register.vue"]]);
   __definePage("pages/index", PagesIndex);
   __definePage("pages/identification-bird", PagesIdentificationBird);
   __definePage("pages/result", PagesResult);
@@ -5019,18 +5942,24 @@ if (uni.restoreGlobal) {
   __definePage("pages/bird-search", PagesBirdSearch);
   __definePage("pages/myself", PagesMyself);
   __definePage("pages/my-bird", PagesMyBird);
+  __definePage("pages/register", PagesRegister);
   const _sfc_main = /* @__PURE__ */ vue.defineComponent({
     __name: "App",
     setup(__props, { expose: __expose }) {
       __expose();
       onLaunch(() => {
-        formatAppLog("log", "at App.vue:4", "App Launch");
+        const token = uni.getStorageSync("userToken");
+        if (!token) {
+          uni.reLaunch({
+            url: "/pages/register"
+          });
+        }
       });
       onShow(() => {
-        formatAppLog("log", "at App.vue:7", "App Show");
+        formatAppLog("log", "at App.vue:13", "App Show");
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:10", "App Hide");
+        formatAppLog("log", "at App.vue:16", "App Hide");
       });
       const __returned__ = { get onLaunch() {
         return onLaunch;

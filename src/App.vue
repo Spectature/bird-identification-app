@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 onLaunch(() => {
-  console.log("App Launch");
+  const token = uni.getStorageSync("userToken");
+  if (!token) {
+    // 如果没有 Token，跳转到登录页
+    uni.reLaunch({
+      url: "/pages/register",
+    });
+  }
 });
 onShow(() => {
   console.log("App Show");

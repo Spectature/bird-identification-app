@@ -14,11 +14,13 @@ declare module 'vue' {
     NutButton: typeof import('nutui-uniapp/components/button/button.vue')['default']
     NutEmpty: typeof import('nutui-uniapp/components/empty/empty.vue')['default']
     NutIcon: typeof import('nutui-uniapp/components/icon/icon.vue')['default']
+    NutInput: typeof import('nutui-uniapp/components/input/input.vue')['default']
     NutSearchbar: typeof import('nutui-uniapp/components/searchbar/searchbar.vue')['default']
     NutSwiper: typeof import('nutui-uniapp/components/swiper/swiper.vue')['default']
     NutSwiperItem: typeof import('nutui-uniapp/components/swiperitem/swiperitem.vue')['default']
     NutTabbar: typeof import('nutui-uniapp/components/tabbar/tabbar.vue')['default']
     NutTabbarItem: typeof import('nutui-uniapp/components/tabbaritem/tabbaritem.vue')['default']
+    NutToast: typeof import('nutui-uniapp/components/toast/toast.vue')['default']
     TabBar: typeof import('./src/components/tab-bar.vue')['default']
     VideoApp: typeof import('./src/components/video-app.vue')['default']
   }
